@@ -568,8 +568,14 @@
                         <img src="${e.target.result}" class="w-full h-full object-cover rounded-md border"/>
                         <button type="button" class="remove-photo-btn" data-file-id="${fileId}">&times;</button>
                     `;
+                    // --- Add coordinates div ---
+                    const coordDiv = document.createElement('div');
+                    coordDiv.className = 'text-[10px] text-gray-600 mt-1 text-center';
+                    coordDiv.innerText = 'Locating...';
+                    previewContainer.appendChild(coordDiv);
+                    // --- End coordinates div ---
                     photoPreview.appendChild(previewContainer);
-                    
+
                     // Add event listener to the new remove button
                     previewContainer.querySelector('.remove-photo-btn').addEventListener('click', (e) => {
                         const idToRemove = e.target.dataset.fileId;
@@ -578,26 +584,48 @@
                         generateDescBtn.disabled = uploadedFiles.length === 0;
                     });
 
+                    // --- Try to extract GPS data from photo (moved inside reader.onload) ---
+                    EXIF.getData(file, function() {
+                        const lat = EXIF.getTag(this, "GPSLatitude");
+                        const lon = EXIF.getTag(this, "GPSLongitude");
+
+                        if (lat && lon) {
+                            const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
+                            const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
+                            const decimalLat = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === "N" ? 1 : -1);
+                            const decimalLon = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === "E" ? 1 : -1);
+
+                            // --- Update coordDiv with EXIF location ---
+                            coordDiv.innerText = `Lat: ${decimalLat.toFixed(5)}, Lon: ${decimalLon.toFixed(5)}`;
+                            // --- End update coordDiv ---
+                            showNotification('Photo location extracted from metadata! Updating map.', 'info');
+                            map.setView([decimalLat, decimalLon], 17);
+                            marker.setLatLng([decimalLat, decimalLon]);
+                            updateLocationDetails(decimalLat, decimalLon);
+                        } else {
+                            // No EXIF GPS → get current location instead
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(position => {
+                                    const { latitude, longitude } = position.coords;
+                                    // --- Update coordDiv with geolocation fallback ---
+                                    coordDiv.innerText = `Lat: ${latitude.toFixed(5)}, Lon: ${longitude.toFixed(5)}`;
+                                    // --- End update coordDiv ---
+                                    showNotification('Geo-tagged photo with current location!', 'success');
+                                    map.setView([latitude, longitude], 17);
+                                    marker.setLatLng([latitude, longitude]);
+                                    updateLocationDetails(latitude, longitude);
+                                }, () => {
+                                    coordDiv.innerText = 'Location unavailable';
+                                    showNotification('Could not fetch current location for this photo.', 'error');
+                                });
+                            } else {
+                                coordDiv.innerText = 'Location unavailable';
+                            }
+                        }
+                    });
+                    // --- End EXIF/geo logic ---
                 };
                 reader.readAsDataURL(file);
-
-                // Try to extract GPS data from photo
-                EXIF.getData(file, function() {
-                    const lat = EXIF.getTag(this, "GPSLatitude");
-                    const lon = EXIF.getTag(this, "GPSLongitude");
-
-                    if (lat && lon) {
-                        const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
-                        const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
-                        const decimalLat = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === "N" ? 1 : -1);
-                        const decimalLon = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === "E" ? 1 : -1);
-                        
-                        showNotification('Photo location extracted! Updating map.', 'info');
-                        map.setView([decimalLat, decimalLon], 17);
-                        marker.setLatLng([decimalLat, decimalLon]);
-                        updateLocationDetails(decimalLat, decimalLon);
-                    }
-                });
             });
             generateDescBtn.disabled = uploadedFiles.length === 0;
         };
