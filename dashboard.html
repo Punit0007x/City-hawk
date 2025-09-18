@@ -609,12 +609,12 @@
                                 showNotification('AI description generated for the photo!', 'success');
                             }
                             // --- End generate dynamic AI description (EXIF branch) ---
-                            // --- Call OpenAI Vision API for description ---
-                            describeImageWithAI(e.target.result).then(description => {
-                                issueDescription.value = description;
-                                showNotification("AI analyzed the photo!", "success");
-                            });
-                            // --- End OpenAI Vision call (EXIF branch) ---
+                    // --- Call OpenAI Vision API for description ---
+                    describeImageWithAI(e.target.result, file.type).then(description => {
+                        issueDescription.value = description;
+                        showNotification("AI analyzed the photo!", "success");
+                    });
+                    // --- End OpenAI Vision call (EXIF branch) ---
                         } else {
                             // No EXIF GPS → get current location instead
                             if (navigator.geolocation) {
@@ -635,7 +635,7 @@
                                     }
                                     // --- End generate dynamic AI description (geolocation branch) ---
                                     // --- Call OpenAI Vision API for description ---
-                                    describeImageWithAI(e.target.result).then(description => {
+                                    describeImageWithAI(e.target.result, file.type).then(description => {
                                         issueDescription.value = description;
                                         showNotification("AI analyzed the photo!", "success");
                                     });
@@ -831,7 +831,7 @@
         updateUIWithTranslations(languageSelect.value);
     });
     // --- Gemini Vision API function ---
-    async function describeImageWithAI(base64Image) {
+    async function describeImageWithAI(base64Image, mimeType = "image/png") {
         try {
             const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=AIzaSyCzkU3jMlKiuJI7cE7zNxdBwawhGJ2JW6I", {
                 method: "POST",
@@ -842,8 +842,8 @@
                     contents: [
                         {
                             parts: [
-                                { text: "Describe the civic issue in this image briefly and clearly." },
-                                { inline_data: { mime_type: "image/png", data: base64Image.split(",")[1] } }
+                                { text: "Imagine you are a resident facing this issue.Describe the problem, its impact on daily life, safety, and community, and explain why it is important to resolve.Be detailed and human-like." },
+                                { inline_data: { mime_type: mimeType, data: base64Image.split(",")[1] } }
                             ]
                         }
                     ]
