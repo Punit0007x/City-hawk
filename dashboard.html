@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Civic Dashboard with Interactive Map</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* A softer gray (slate-50) */
+        }
+        .header-gradient {
+            background-size: 200% 200%;
+            background-image: linear-gradient(to right, #f97316, #ea580c, #ef4444);
+            animation: gradient-animation 8s ease infinite;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .issue-btn.selected {
+            background-color: #fb923c; /* orange-400 */
+            color: white;
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(251, 146, 60, 0.4);
+            border-color: #fdba74; /* orange-300 */
+        }
+        .leaflet-container {
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150%);
+            padding: 12px 24px;
+            border-radius: 9999px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.4s ease-in-out;
+            z-index: 1000;
+        }
+        #notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        /* Custom scrollbar */
+        #nearbyIssues::-webkit-scrollbar { width: 8px; }
+        #nearbyIssues::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        #nearbyIssues::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        #nearbyIssues::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        .photo-preview-item { position: relative; }
+        .remove-photo-btn {
+            position: absolute; top: -5px; right: -5px;
+            background-color: rgba(0,0,0,0.6); color: white;
+            border: none; border-radius: 50%;
+            width: 20px; height: 20px; font-size: 12px;
+            font-weight: bold; line-height: 20px; text-align: center;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .remove-photo-btn:hover { background-color: rgba(239, 68, 68, 0.9); }
+
+        /* Skeleton Loader for Issues */
+        .skeleton-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .skeleton {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 0.25rem;
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <header class="header-gradient shadow-lg sticky top-0 z-50 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-3xl font-bold tracking-tight">Citizen Dashboard</h1>
+                <div class="text-right mt-2 md:mt-0">
+                    <div class="flex items-center space-x-4">
+                        <div class="language-selector">
+                            <select id="languageSelect" aria-label="Select Language" class="bg-white/20 border-white/30 rounded-md text-sm p-1.5 focus:ring-white focus:border-white text-white">
+                              <option value="en" class="text-black">English</option>
+                              <option value="hi" class="text-black">हिन्दी</option>
+                              <option value="bn" class="text-black">বাংলা</option>
+                              <option value="te" class="text-black">తెలుగు</option>
+                              <option value="mr" class="text-black">मराठी</option>
+                              <option value="ta" class="text-black">தமிழ்</option>
+                              <option value="gu" class="text-black">ગુજરાતી</option>
+                              <option value="kn" class="text-black">ಕನ್ನಡ</option>
+                              <option value="ml" class="text-black">മലയാളം</option>
+                              <option value="or" class="text-black">ଓଡ଼ିଆ</option>
+                            </select>
+                        </div>
+                        <nav class="hidden md:flex items-center space-x-4">
+                            <a href="my_report.html" class="nav-link font-medium hover:text-orange-200 transition-colors">My Reports</a>
+                            <a href="#" class="font-medium hover:text-orange-200 transition-colors" data-translate-key="profile">Profile</a>
+                            <a href="#" id="logoutBtn" class="py-2 px-4 text-sm font-bold rounded-lg transition-transform duration-200 bg-white/20 hover:bg-white/30 hover:scale-105" data-translate-key="logout">Logout</a>
+                        </nav>
+                    </div>
+                    <div id="datetime" class="text-xs font-medium text-orange-100 mt-1 text-center md:text-right"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="stateSelect" class="block text-sm font-medium text-gray-700" data-translate-key="selectState">Select State</label>
+                    <select id="stateSelect" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+                      <option value="" data-translate-key="selectStateOption">--Select State--</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="districtSelect" class="block text-sm font-medium text-gray-700" data-translate-key="selectDistrict">Select District</label>
+                    <select id="districtSelect" disabled class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+                      <option value="" data-translate-key="selectDistrictOption">--Select District--</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 tracking-tight" data-translate-key="reportIssue">Report an Issue <span class="text-red-500">*</span></h2>
+                    <form id="reportForm" aria-label="Report civic issue form">
+                        <div id="issueCategories" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-6">
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Potholes"><span class="text-3xl">🕳️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="pothole">Pothole</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Garbage"><span class="text-3xl">🗑️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="garbage">Garbage</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Streetlights"><span class="text-3xl">💡</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="streetlights">Streetlights</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Water Leak"><span class="text-3xl">💧</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="waterLeak">Water Leak</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Garbage Overflow"><span class="text-3xl">🗑️⬆️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="overflow">Overflow</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Illegal Dumping"><span class="text-3xl">🚯</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="dumping">Dumping</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Encroachments"><span class="text-3xl">🚧</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="encroachment">Encroachment</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Damaged Property"><span class="text-3xl">🏚️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="damage">Damage</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Blocked Drains"><span class="text-3xl">🚱</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="drains">Drains</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Open Sewage"><span class="text-3xl">🦠</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="sewage">Sewage</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Power Outage"><span class="text-3xl">⚡</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="powerOutage">Power Outage</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Broken Public Toilets"><span class="text-3xl">🚻❌</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="toilets">Toilets</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Accident-prone Zone"><span class="text-3xl">⚠️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="dangerZone">Danger Zone</span></button>
+                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Other"><span class="text-3xl">❓</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="other">Other</span></button>
+                        </div>
+                        <input type="hidden" id="selectedCategory" name="issueCategory" required>
+                        
+                        <label for="issueDescription" class="block text-sm font-medium text-gray-700">Issue Description <span class="text-red-500">*</span></label>
+                        <textarea id="issueDescription" name="issueDescription" rows="6" placeholder="Describe your issue, or generate one with AI after uploading photos." class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-orange-500 focus:border-orange-500" required></textarea>
+                        
+                        <label for="issuePhoto" class="mt-4 w-full cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-slate-50 p-6 text-center hover:border-orange-400 hover:bg-orange-50 transition-colors block">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            <span class="mt-2 block text-sm font-medium text-gray-900" data-translate-key="uploadPhotoText">Click to upload photo(s) (Max 5)</span>
+                        </label>
+                        <input type="file" accept="image/*" id="issuePhoto" name="issuePhoto" class="hidden" multiple/>
+                        <div id="photoPreview" class="mt-4 flex flex-wrap gap-2"></div>
+                        
+                        <button type="button" id="generateDescBtn" class="mt-4 w-full py-2.5 px-4 text-sm font-bold rounded-lg transition-all duration-300 bg-slate-700 hover:bg-slate-800 text-white disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:scale-100">✨ Generate Description with AI</button>
+                         
+                        <div class="relative mt-4 p-4 border rounded-lg bg-slate-50">
+                            <h3 class="text-lg font-semibold mb-2" data-translate-key="setLocation">Set Location</h3>
+                            <div class="mb-3">
+                                <label for="fullAddress" class="block text-sm font-medium text-gray-700" data-translate-key="fullAddress">Full Address <span class="text-red-500">*</span></label>
+                                <input type="text" id="fullAddress" name="fullAddress" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Type address and press Enter, or drag pin on map" required />
+                            </div>
+                            <div class="absolute top-16 right-2 z-[401] flex flex-col space-y-2">
+                                <button type="button" id="locateMeBtn" class="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors" title="Center on my location">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                                </button>
+                                <button type="button" id="resetMapBtn" class="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors" title="Reset Map">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 4l16 16" /></svg>
+                                </button>
+                            </div>
+
+                            <p class="text-sm text-gray-600 mb-2" id="mapInstructions">
+                               🗺️ Type your address or drag the red pin to the correct place on the map.
+                            </p>
+                            <div id="map" class="w-full h-64 sm:h-80 rounded-lg border bg-gray-200"></div>
+                            <div id="selectedAddress" class="mt-2 text-sm font-medium text-gray-700"></div>
+                            <div id="coordsDisplay" class="mt-2 text-xs text-gray-500 text-center" data-translate-key="locationPin">Location Pin</div>
+                            <input type="hidden" id="latitude" name="latitude" />
+                            <input type="hidden" id="longitude" name="longitude" />
+                        </div>
+
+                        <button type="submit" class="mt-6 w-full py-3 px-4 text-base font-bold rounded-lg transition-all duration-300 header-gradient text-white shadow-lg hover:shadow-xl hover:scale-[1.02]" data-translate-key="submitReport">Submit Report</button>
+                    </form>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold tracking-tight" data-translate-key="issuesNearYou">Issues Near You</h2>
+                    <button id="summarizeIssuesBtn" class="text-sm font-semibold text-orange-600 hover:text-orange-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">✨ Summarize</button>
+                </div>
+                <div id="issuesSummary" class="hidden bg-orange-50 border-l-4 border-orange-400 text-orange-700 p-4 rounded-r-lg mb-4 text-sm"></div>
+                <div id="nearbyIssues" aria-live="polite" class="overflow-y-auto max-h-[600px] pr-2 space-y-3">
+                    </div>
+            </div>
+        </div>
+    </main>
+    <div id="notification"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DOM ELEMENTS ---
+        const datetimeDiv = document.getElementById('datetime');
+        const reportForm = document.getElementById('reportForm');
+        const issueButtons = document.querySelectorAll('.issue-btn');
+        const selectedCategoryInput = document.getElementById('selectedCategory');
+        const nearbyIssuesDiv = document.getElementById('nearbyIssues');
+        const issueDescription = document.getElementById('issueDescription');
+        const generateDescBtn = document.getElementById('generateDescBtn');
+        const issuePhotoInput = document.getElementById('issuePhoto');
+        const photoPreview = document.getElementById('photoPreview');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const notificationDiv = document.getElementById('notification');
+        const fullAddressInput = document.getElementById('fullAddress');
+        const selectedAddressDiv = document.getElementById('selectedAddress');
+        const coordsDisplay = document.getElementById('coordsDisplay');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const locateMeBtn = document.getElementById('locateMeBtn');
+        const resetMapBtn = document.getElementById('resetMapBtn');
+        const stateSelect = document.getElementById('stateSelect');
+        const districtSelect = document.getElementById('districtSelect');
+        const languageSelect = document.getElementById('languageSelect');
+        const summarizeIssuesBtn = document.getElementById('summarizeIssuesBtn');
+        const issuesSummaryDiv = document.getElementById('issuesSummary');
+
+        // --- MAP & LOCATION VARIABLES ---
+        let map;
+        let marker;
+        const INDIA_CENTER_COORDS = [22.5937, 78.9629]; 
+        const INDIA_WIDE_ZOOM = 5;
+        let uploadedFiles = [];
+        let nearbyIssuesData = [];
+
+        // --- MOCK DATA ---
+        const reportedIssues = [
+            { id: 1, category: 'Potholes', description: 'Deep pothole on main road', lat: 12.9716, lon: 77.5946, status: 'reported' },
+            { id: 2, category: 'Garbage', description: 'Overflowing bin near park', lat: 12.9720, lon: 77.5950, status: 'inprogress' },
+            { id: 3, category: 'Streetlights', description: 'Streetlight not working for a week', lat: 12.9700, lon: 77.5930, status: 'resolved' },
+            { id: 4, category: 'Water Leak', description: 'Pipe broken, clean water wasted', lat: 12.9695, lon: 77.5962, status: 'reported' }
+        ];
+
+        // --- TRANSLATION DATA ---
+        const translations = {
+            'hi': {
+                'reportIssue': 'समस्या की रिपोर्ट करें',
+                'pothole': 'गड्ढा',
+                'garbage': 'कचरा',
+                'streetlights': 'स्ट्रीटलाइट',
+                'waterLeak': 'पानी का रिसाव',
+                'overflow': 'ओवरफ्लो',
+                'dumping': 'अवैध डंपिंग',
+                'encroachment': 'अतिक्रमण',
+                'damage': 'क्षति',
+                'drains': 'नालियां',
+                'sewage': 'सीवेज',
+                'powerOutage': 'बिजली कटौती',
+                'toilets': 'शौचालय',
+                'dangerZone': 'खतरनाक क्षेत्र',
+                'other': 'अन्य',
+                'uploadPhotoText': 'फोटो अपलोड करने के लिए क्लिक करें (अधिकतम 5)',
+                'setLocation': 'स्थान निर्धारित करें',
+                'fullAddress': 'पूरा पता',
+                'locationPin': 'स्थान पिन',
+                'submitReport': 'रिपोर्ट सबमिट करें',
+                'issuesNearYou': 'आपके आस-पास की समस्याएं',
+                'selectState': 'राज्य चुनें',
+                'selectDistrict': 'जिला चुनें',
+                'selectStateOption': '--राज्य चुनें--',
+                'selectDistrictOption': '--जिला चुनें--',
+                'profile': 'प्रोफ़ाइल',
+                'logout': 'लॉग आउट',
+            },
+            // Add other languages here...
+        };
+
+        const stateDistrictData = {
+            "Andaman and Nicobar Islands": ["Nicobar", "North and Middle Andaman", "South Andaman"],
+            "Andhra Pradesh": ["Alluri Sitharama Raju", "Anakapalli", "Ananthapuramu", "Annamayya", "Bapatla", "Chittoor", "Dr. B.R. Ambedkar Konaseema", "East Godavari", "Eluru", "Guntur", "Kakinada", "Krishna", "Kurnool", "Nandyal", "NTR", "Palnadu", "Parvathipuram Manyam", "Prakasam", "SPS Nellore", "Sri Sathya Sai", "Srikakulam", "Tirupati", "Visakhapatnam", "Vizianagaram", "West Godavari", "YSR Kadapa"],
+            "Arunachal Pradesh": ["Anjaw", "Changlang", "Dibang Valley", "East Kameng", "East Siang", "Kamle", "Kra Daadi", "Kurung Kumey", "Lepa Rada", "Lohit", "Longding", "Lower Dibang Valley", "Lower Siang", "Lower Subansiri", "Namsai", "Pakke Kessang", "Papum Pare", "Shi Yomi", "Siang", "Tawang", "Tirap", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
+            "Assam": ["Bajali", "Baksa", "Barpeta", "Biswanath", "Bongaigaon", "Cachar", "Charaideo", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Dima Hasao", "Goalpara", "Golaghat", "Hailakandi", "Hojai", "Jorhat", "Kamrup", "Kamrup Metropolitan", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Majuli", "Morigaon", "Nagaon", "Nalbari", "Sivasagar", "Sonitpur", "South Salmara-Mankachar", "Tamulpur", "Tinsukia", "Udalguri", "West Karbi Anglong"],
+            "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+            "Chandigarh": ["Chandigarh"],
+            "Chhattisgarh": ["Balod", "Baloda Bazar", "Balrampur", "Bastar", "Bemetara", "Bijapur", "Bilaspur", "Dantewada", "Dhamtari", "Durg", "Gariaband", "Gaurela Pendra Marwahi", "Janjgir-Champa", "Jashpur", "Kabirdham", "Kanker", "Khairagarh-Chhuikhadan-Gandai", "Kondagaon", "Korba", "Koriya", "Mahasamund", "Manendragarh-Chirmiri-Bharatpur", "Mohla-Manpur-Ambagarh Chowki", "Mungeli", "Narayanpur", "Raigarh", "Raipur", "Rajnandgaon", "Sarangarh-Bilaigarh", "Sakti", "Sukma", "Surajpur", "Surguja"],
+            "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Diu", "Dadra and Nagar Haveli"],
+            "Delhi": ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+            "Goa": ["North Goa", "South Goa"],
+            "Gujarat": ["Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch", "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka", "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch", "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal", "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar", "Tapi", "Vadodara", "Valsad"],
+            "Haryana": ["Ambala", "Bhiwani", "Charkhi Dadri", "Faridabad", "Fatehabad", "Gurugram", "Hisar", "Jhajjar", "Jind", "Kaithal", "Karnal", "Kurukshetra", "Mahendragarh", "Nuh", "Palwal", "Panchkula", "Panipat", "Rewari", "Rohtak", "Sirsa", "Sonipat", "Yamunanagar"],
+            "Himachal Pradesh": ["Bilaspur", "Chamba", "Hamirpur", "Kangra", "Kinnaur", "Kullu", "Lahaul and Spiti", "Mandi", "Shimla", "Sirmaur", "Solan", "Una"],
+            "Jammu and Kashmir": ["Anantnag", "Bandipora", "Baramulla", "Budgam", "Doda", "Ganderbal", "Jammu", "Kathua", "Kishtwar", "Kulgam", "Kupwara", "Poonch", "Pulwama", "Rajouri", "Ramban", "Reasi", "Samba", "Shopian", "Srinagar", "Udhampur"],
+            "Jharkhand": ["Bokaro", "Chatra", "Deoghar", "Dhanbad", "Dumka", "East Singhbhum", "Garhwa", "Giridih", "Godda", "Gumla", "Hazaribagh", "Jamtara", "Khunti", "Koderma", "Latehar", "Lohardaga", "Pakur", "Palamu", "Ramgarh", "Ranchi", "Sahebganj", "Seraikela Kharsawan", "Simdega", "West Singhbhum"],
+            "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayanagara", "Vijayapura", "Yadgir"],
+            "Kerala": ["Alappuzha", "Ernakulam", "Idukki", "Kannur", "Kasaragod", "Kollam", "Kottayam", "Kozhikode", "Malappuram", "Palakkad", "Pathanamthitta", "Thiruvananthapuram", "Thrissur", "Wayanad"],
+            "Ladakh": ["Kargil", "Leh"],
+            "Lakshadweep": ["Lakshadweep"],
+            "Madhya Pradesh": ["Agar Malwa", "Alirajpur", "Anuppur", "Ashoknagar", "Balaghat", "Barwani", "Betul", "Bhind", "Bhopal", "Burhanpur", "Chhatarpur", "Chhindwara", "Damoh", "Datia", "Dewas", "Dhar", "Dindori", "Guna", "Gwalior", "Harda", "Indore", "Jabalpur", "Jhabua", "Katni", "Khandwa", "Khargone", "Maihar", "Mandla", "Mandsaur", "Mauganj", "Morena", "Narmadapuram", "Narsinghpur", "Neemuch", "Niwari", "Pachmarhi", "Pandhurna", "Panna", "Raisen", "Rajgarh", "Ratlam", "Rewa", "Sagar", "Satna", "Sehore", "Seoni", "Shahdol", "Shajapur", "Sheopur", "Shivpuri", "Sidhi", "Singrauli", "Tikamgarh", "Ujjain", "Umaria", "Vidisha"],
+            "Maharashtra": ["Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"],
+            "Manipur": ["Bishnupur", "Chandel", "Churachandpur", "Imphal East", "Imphal West", "Jiribam", "Kakching", "Kamjong", "Kangpokpi", "Noney", "Pherzawl", "Senapati", "Tamenglong", "Tengnoupal", "Thoubal", "Ukhrul"],
+            "Meghalaya": ["East Garo Hills", "East Jaintia Hills", "East Khasi Hills", "North Garo Hills", "Ri Bhoi", "South Garo Hills", "South West Garo Hills", "South West Khasi Hills", "West Garo Hills", "West Jaintia Hills", "West Khasi Hills"],
+            "Mizoram": ["Aizawl", "Champhai", "Hnahthial", "Khawzawl", "Kolasib", "Lawngtlai", "Lunglei", "Mamit", "Saiha", "Saitual", "Serchhip"],
+            "Nagaland": ["Chümoukedima", "Dimapur", "Kiphire", "Kohima", "Longleng", "Mokokchung", "Mon", "Niuland", "Noklak", "Peren", "Phek", "Shamator", "Tseminyü", "Tuensang", "Wokha", "Zunheboto"],
+            "Odisha": ["Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Sonepur", "Sundargarh"],
+            "Puducherry": ["Karaikal", "Mahe", "Puducherry", "Yanam"],
+            "Punjab": ["Amritsar", "Barnala", "Bathinda", "Faridkot", "Fatehgarh Sahib", "Fazilka", "Ferozepur", "Gurdaspur", "Hoshiarpur", "Jalandhar", "Kapurthala", "Ludhiana", "Malerkotla", "Mansa", "Moga", "Pathankot", "Patiala", "Rupnagar", "Sahibzada Ajit Singh Nagar", "Sangrur", "Shaheed Bhagat Singh Nagar", "Sri Muktsar Sahib", "Tarn Taran"],
+            "Rajasthan": ["Ajmer", "Alwar", "Anupgarh", "Balotra", "Banswara", "Baran", "Barmer", "Beawar", "Bharatpur", "Bhilwara", "Bikaner", "Bundi", "Chittorgarh", "Churu", "Dausa", "Deeg", "Dholpur", "Didwana-Kuchaman", "Dungarpur", "Ganganagar", "Gangapur City", "Hanumangarh", "Jaipur", "Jaipur Rural", "Jaisalmer", "Jalore", "Jhalawar", "Jhunjhunu", "Jodhpur", "Jodhpur Rural", "Karauli", "Kekri", "Khairthal-Tijara", "Kota", "Kotputli-Behror", "Nagaur", "Neem Ka Thana", "Pali", "Phalodi", "Pratapgarh", "Rajsamand", "Salumbar", "Sanchore", "Sawai Madhopur", "Shahpura", "Sikar", "Sirohi", "Tonk", "Udaipur"],
+            "Sikkim": ["East Sikkim", "North Sikkim", "Pakyong", "Soreng", "South Sikkim", "West Sikkim"],
+            "Tamil Nadu": ["Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kancheepuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"],
+            "Telangana": ["Adilabad", "Bhadradri Kothagudem", "Hanamkonda", "Hyderabad", "Jagitial", "Jangaon", "Jayashankar Bhupalpally", "Jogulamba Gadwal", "Kamareddy", "Karimnagar", "Khammam", "Komaram Bheem", "Mahabubabad", "Mahabubnagar", "Mancherial", "Medak", "Medchal-Malkajgiri", "Mulugu", "Nagarkurnool", "Nalgonda", "Narayanpet", "Nirmal", "Nizamabad", "Peddapalli", "Rajanna Sircilla", "Ranga Reddy", "Sangareddy", "Siddipet", "Suryapet", "Vikarabad", "Wanaparthy", "Warangal", "Yadadri Bhuvanagiri"],
+            "Tripura": ["Dhalai", "Gomati", "Khowai", "North Tripura", "Sepahijala", "South Tripura", "Unakoti", "West Tripura"],
+            "Uttar Pradesh": ["Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddh Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"],
+            "Uttarakhand": ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar", "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal", "Udham Singh Nagar", "Uttarkashi"],
+            "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
+        };
+
+
+        // --- UTILITY FUNCTIONS ---
+        const updateDateTime = () => {
+            datetimeDiv.textContent = new Date().toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'medium' });
+        };
+        
+        const showNotification = (message, type = 'success') => {
+            let bgColor = 'bg-green-500';
+            if (type === 'error') bgColor = 'bg-red-500';
+            if (type === 'info') bgColor = 'bg-blue-500';
+            
+            notificationDiv.textContent = message;
+            notificationDiv.className = `fixed bottom-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white ${bgColor} shadow-lg transition-transform duration-300 transform show`;
+            
+            setTimeout(() => {
+                notificationDiv.classList.remove('show');
+            }, 3000);
+        };
+
+        const calculateDistance = (lat1, lon1, lat2, lon2) => {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in km
+        };
+
+        const updateUIWithTranslations = (lang) => {
+            if (!translations[lang]) return;
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+        };
+
+        // --- CORE FUNCTIONS ---
+        const populateStates = () => {
+            const states = Object.keys(stateDistrictData).sort();
+            states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
+        };
+        
+        const populateDistricts = (state) => {
+            districtSelect.innerHTML = '<option value="">--Select District--</option>';
+            if (state && stateDistrictData[state]) {
+                districtSelect.disabled = false;
+                districtSelect.classList.remove('bg-gray-100');
+                stateDistrictData[state].sort().forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    districtSelect.appendChild(option);
+                });
+            } else {
+                districtSelect.disabled = true;
+                 districtSelect.classList.add('bg-gray-100');
+            }
+        };
+
+        const initMap = (center, zoom) => {
+            if (map) map.remove();
+            map = L.map('map').setView(center, zoom);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            marker = L.marker(center, { draggable: true }).addTo(map);
+            marker.on('dragend', (event) => {
+                const position = marker.getLatLng();
+                updateLocationDetails(position.lat, position.lng);
+            });
+            updateLocationDetails(center[0], center[1]);
+        };
+
+        const locateUser = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    map.setView([latitude, longitude], 15);
+                    marker.setLatLng([latitude, longitude]);
+                    updateLocationDetails(latitude, longitude);
+                    fetchNearbyIssues(latitude, longitude);
+                    showNotification('Location found!', 'success');
+                }, () => {
+                    showNotification('Could not access your location. Please enable location services.', 'error');
+                    fetchNearbyIssues(INDIA_CENTER_COORDS[0], INDIA_CENTER_COORDS[1]); // Fetch for default location
+                });
+            } else {
+                showNotification('Geolocation is not supported by this browser.', 'error');
+                fetchNearbyIssues(INDIA_CENTER_COORDS[0], INDIA_CENTER_COORDS[1]); // Fetch for default location
+            }
+        };
+
+        const updateLocationDetails = async (lat, lng) => {
+            latitudeInput.value = lat;
+            longitudeInput.value = lng;
+            coordsDisplay.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lng.toFixed(5)}`;
+            
+            // Fetch address from coordinates (reverse geocoding)
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                const data = await response.json();
+                if (data && data.display_name) {
+                    const address = data.display_name;
+                    fullAddressInput.value = address;
+                    selectedAddressDiv.textContent = `Selected: ${address}`;
+                }
+            } catch (error) {
+                console.error("Reverse geocoding failed:", error);
+                selectedAddressDiv.textContent = 'Could not fetch address.';
+            }
+            fetchNearbyIssues(lat, lng);
+        };
+        
+        function fetchNearbyIssues(lat, lon) {
+            // Show skeleton loader immediately
+            nearbyIssuesDiv.innerHTML = `
+                <div class="skeleton-card space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="skeleton h-4 w-2/5"></div>
+                        <div class="skeleton h-5 w-1/4"></div>
+                    </div>
+                    <div class="skeleton h-3 w-full"></div>
+                    <div class="skeleton h-3 w-3/4"></div>
+                    <div class="skeleton h-2 w-1/3 mt-1"></div>
+                </div>
+                <div class="skeleton-card space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="skeleton h-4 w-1/3"></div>
+                        <div class="skeleton h-5 w-1/4"></div>
+                    </div>
+                    <div class="skeleton h-3 w-full"></div>
+                    <div class="skeleton h-3 w-5/6"></div>
+                    <div class="skeleton h-2 w-1/4 mt-1"></div>
+                </div>
+            `;
+            nearbyIssuesDiv.dataset.loading = "true";
+
+
+            // Simulate network delay to see the loader
+            setTimeout(() => {
+                const nearby = reportedIssues.map(issue => ({
+                    ...issue,
+                    distance: calculateDistance(lat, lon, issue.lat, issue.lon)
+                })).filter(issue => issue.distance <= 5).sort((a, b) => a.distance - b.distance);
+                
+                nearbyIssuesData = nearby;
+                delete nearbyIssuesDiv.dataset.loading;
+                displayIssues(nearby);
+                summarizeIssuesBtn.disabled = nearby.length === 0;
+            }, 800); // 800ms delay
+        }
+        
+        function displayIssues(issues) {
+            nearbyIssuesDiv.innerHTML = ''; // Clear previous content
+
+            // Show skeleton loader if issues array is not yet populated
+            if (issues.length === 0) {
+                // Show a "No issues found" message if the nearbyIssuesData is confirmed empty
+                if (nearbyIssuesData.length === 0 && !nearbyIssuesDiv.dataset.loading) {
+                     nearbyIssuesDiv.innerHTML = `<div class="text-center text-gray-500 py-8">No issues found within 5km of pin.</div>`;
+                }
+                return;
+            }
+            
+            issues.forEach(issue => {
+                let statusColor, statusBorderColor;
+                switch (issue.status) {
+                    case 'resolved': 
+                        statusColor = 'bg-green-100 text-green-800'; 
+                        statusBorderColor = 'border-green-300';
+                        break;
+                    case 'inprogress': 
+                        statusColor = 'bg-blue-100 text-blue-800'; 
+                        statusBorderColor = 'border-blue-300';
+                        break;
+                    default: 
+                        statusColor = 'bg-yellow-100 text-yellow-800';
+                        statusBorderColor = 'border-yellow-300';
+                }
+                const issueCard = `
+                    <div class="p-4 bg-white border ${statusBorderColor} rounded-lg shadow-sm hover:shadow-lg hover:border-orange-400 transition-all duration-300 cursor-pointer transform hover:-translate-y-1" onclick="window.dispatchEvent(new CustomEvent('panToIssue', { detail: { lat: ${issue.lat}, lon: ${issue.lon} } }))">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-gray-800 pr-2">${issue.category}</h3>
+                            <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColor} whitespace-nowrap">${issue.status}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">${issue.description}</p>
+                        <p class="text-xs text-gray-400 mt-2 font-medium">${issue.distance.toFixed(2)} km away</p>
+                    </div>
+                `;
+                nearbyIssuesDiv.innerHTML += issueCard;
+            });
+        }
+
+
+        const handleCategorySelect = (button) => {
+            issueButtons.forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            selectedCategoryInput.value = button.dataset.category;
+        };
+        
+        const handlePhotoUpload = (event) => {
+            const files = event.target.files;
+            if (files.length + uploadedFiles.length > 5) {
+                showNotification('You can only upload a maximum of 5 photos.', 'error');
+                return;
+            }
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileId = Date.now() + "_" + file.name; // Create a unique ID
+                    uploadedFiles.push({ id: fileId, file: file });
+
+                    const previewContainer = document.createElement('div');
+                    previewContainer.className = 'photo-preview-item w-24 h-24';
+                    previewContainer.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-full object-cover rounded-md border"/>
+                        <button type="button" class="remove-photo-btn" data-file-id="${fileId}">&times;</button>
+                    `;
+                    photoPreview.appendChild(previewContainer);
+                    
+                    // Add event listener to the new remove button
+                    previewContainer.querySelector('.remove-photo-btn').addEventListener('click', (e) => {
+                        const idToRemove = e.target.dataset.fileId;
+                        uploadedFiles = uploadedFiles.filter(f => f.id != idToRemove);
+                        e.target.parentElement.remove();
+                        generateDescBtn.disabled = uploadedFiles.length === 0;
+                    });
+
+                };
+                reader.readAsDataURL(file);
+
+                // Try to extract GPS data from photo
+                EXIF.getData(file, function() {
+                    const lat = EXIF.getTag(this, "GPSLatitude");
+                    const lon = EXIF.getTag(this, "GPSLongitude");
+
+                    if (lat && lon) {
+                        const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
+                        const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
+                        const decimalLat = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === "N" ? 1 : -1);
+                        const decimalLon = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === "E" ? 1 : -1);
+                        
+                        showNotification('Photo location extracted! Updating map.', 'info');
+                        map.setView([decimalLat, decimalLon], 17);
+                        marker.setLatLng([decimalLat, decimalLon]);
+                        updateLocationDetails(decimalLat, decimalLon);
+                    }
+                });
+            });
+            generateDescBtn.disabled = uploadedFiles.length === 0;
+        };
+        
+        // --- NEW DYNAMIC GEMINI API (MOCKED) ---
+        const generateDynamicDescription = (category, imageCount) => {
+            let description = `Based on the analysis of the ${imageCount} uploaded image(s) for the '${category}' category, the following is observed: `;
+            switch (category) {
+                case 'Potholes':
+                    description += "A significant road surface defect, identified as a pothole, is present. This poses a potential hazard to vehicles and pedestrians. The images from multiple angles confirm the depth and width of the pothole.";
+                    break;
+                case 'Garbage':
+                    description += "There is a notable accumulation of uncollected waste. The images detail the extent of the garbage, which includes various types of refuse, indicating a need for immediate sanitation services.";
+                    break;
+                case 'Streetlights':
+                    description += "A malfunctioning streetlight has been identified. The images confirm that the light is not operational, which could compromise safety in the area during nighttime.";
+                    break;
+                case 'Water Leak':
+                    description += "A water leak from a public utility pipe is visible. The images document the flow of water and the affected area, highlighting the wastage of water and potential for road damage.";
+                    break;
+                default:
+                    description += "A civic issue requiring attention has been documented. The images provide visual evidence of the problem, and it is recommended that the appropriate authorities investigate further.";
+                    break;
+            }
+            return description;
+        };
+
+        const generateDescriptionWithGemini = async () => {
+            const selectedCategory = selectedCategoryInput.value;
+            const imageCount = uploadedFiles.length;
+
+            if (imageCount === 0) {
+                showNotification('Please upload a photo first.', 'error');
+                return;
+            }
+            if (!selectedCategory) {
+                showNotification('Please select an issue category first.', 'error');
+                return;
+            }
+
+            generateDescBtn.disabled = true;
+            generateDescBtn.textContent = '🧠 Analyzing...';
+            
+            // Simulate a short delay for analysis
+            setTimeout(() => {
+                const dynamicDescription = generateDynamicDescription(selectedCategory, imageCount);
+                issueDescription.value = dynamicDescription;
+                generateDescBtn.disabled = false;
+                generateDescBtn.textContent = '✨ Generate Description with AI';
+                showNotification('Description generated successfully!', 'success');
+            }, 1200);
+        };
+        
+        const summarizeNearbyIssues = () => {
+             if (nearbyIssuesData.length === 0) {
+                showNotification('No issues nearby to summarize.', 'info');
+                return;
+            }
+
+            summarizeIssuesBtn.disabled = true;
+            summarizeIssuesBtn.textContent = '🧠 Summarizing...';
+            issuesSummaryDiv.innerHTML = '<div class="skeleton h-4 w-full mb-2"></div><div class="skeleton h-4 w-3/4"></div>';
+            issuesSummaryDiv.classList.remove('hidden');
+
+            // Mock Gemini API call for summary
+            setTimeout(() => {
+                const issueCounts = nearbyIssuesData.reduce((acc, issue) => {
+                    acc[issue.category] = (acc[issue.category] || 0) + 1;
+                    return acc;
+                }, {});
+
+                const totalIssues = nearbyIssuesData.length;
+                const uniqueCategories = Object.keys(issueCounts).length;
+                
+                let summary = `Analysis of ${totalIssues} nearby issues reveals ${uniqueCategories} distinct problem categories. `;
+                
+                const sortedIssues = Object.entries(issueCounts).sort(([,a],[,b]) => b-a);
+
+                if(sortedIssues.length > 0) {
+                    summary += `The most prevalent issue is '${sortedIssues[0][0]}' with ${sortedIssues[0][1]} reported case(s). `;
+                }
+                if(sortedIssues.length > 1) {
+                    summary += `This is followed by '${sortedIssues[1][0]}' with ${sortedIssues[1][1]} case(s). `;
+                }
+
+                const resolvedCount = nearbyIssuesData.filter(i => i.status === 'resolved').length;
+                if(resolvedCount > 0) {
+                    summary += `${resolvedCount} issue(s) in the vicinity have been marked as resolved.`
+                } else {
+                    summary += "It appears no issues in the immediate area have been resolved yet."
+                }
+                
+                issuesSummaryDiv.textContent = summary;
+                summarizeIssuesBtn.disabled = false;
+                summarizeIssuesBtn.textContent = '✨ Summarize';
+            }, 1500);
+        };
+
+
+        // --- EVENT LISTENERS ---
+        reportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(reportForm);
+            const data = Object.fromEntries(formData.entries());
+            data.photos = uploadedFiles.map(f => f.file.name); // Just get names for simulation
+
+            if (!data.issueCategory) {
+                showNotification('Please select an issue category.', 'error');
+                return;
+            }
+            if (!data.latitude || !data.longitude) {
+                showNotification('Please set a location on the map.', 'error');
+                return;
+            }
+
+            console.log('Report Submitted:', data);
+            showNotification('Issue reported successfully!', 'success');
+            reportForm.reset();
+            photoPreview.innerHTML = '';
+            uploadedFiles = [];
+            issueButtons.forEach(btn => btn.classList.remove('selected'));
+        });
+
+        fullAddressInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = fullAddressInput.value;
+                if (!query) return;
+
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const { lat, lon } = data[0];
+                        map.setView([lat, lon], 17);
+                        marker.setLatLng([lat, lon]);
+                        updateLocationDetails(parseFloat(lat), parseFloat(lon));
+                    } else {
+                        showNotification('Address not found.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Geocoding failed:', error);
+                    showNotification('Error finding address.', 'error');
+                }
+            }
+        });
+
+        issuePhotoInput.addEventListener('change', handlePhotoUpload);
+        locateMeBtn.addEventListener('click', locateUser);
+        resetMapBtn.addEventListener('click', () => initMap(INDIA_CENTER_COORDS, INDIA_WIDE_ZOOM));
+        stateSelect.addEventListener('change', (e) => populateDistricts(e.target.value));
+        languageSelect.addEventListener('change', (e) => updateUIWithTranslations(e.target.value));
+        summarizeIssuesBtn.addEventListener('click', summarizeNearbyIssues);
+        generateDescBtn.addEventListener('click', generateDescriptionWithGemini);
+        issueButtons.forEach(button => {
+            button.addEventListener('click', () => handleCategorySelect(button));
+        });
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showNotification('Logging you out...', 'info');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        });
+        window.addEventListener('panToIssue', (e) => {
+            if (map && e.detail) {
+                map.flyTo([e.detail.lat, e.detail.lon], 16);
+            }
+        });
+
+        // --- INITIALIZATION ---
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        populateStates();
+        initMap(INDIA_CENTER_COORDS, INDIA_WIDE_ZOOM);
+        locateUser(); // Attempt to find user's location on page load
+        updateUIWithTranslations(languageSelect.value);
+    });
+</script>
+
+</body>
+</html>
