@@ -830,7 +830,7 @@
         locateUser(); // Attempt to find user's location on page load
         updateUIWithTranslations(languageSelect.value);
     });
-    // --- Gemini Vision API function ---
+    // --- Gemini Vision API function (fixed) ---
     async function describeImageWithAI(base64Image, mimeType = "image/png") {
         try {
             const response = await fetch(
@@ -846,7 +846,7 @@
                                 parts: [
                                     {
                                         text: `
-You are analyzing a photo uploaded by a citizen to report a civic issue. 
+You are analyzing a photo uploaded by a citizen to report a civic issue.
 Look closely at the visual details of the photo and describe exactly what you see.
 
 Your response must include:
@@ -855,11 +855,20 @@ Your response must include:
 3. The impact on daily life, safety, and environment.
 4. Why resolving it quickly is important.
 
-Write in a clear, empathetic, and natural tone (like the citizen is explaining their problem). 
+Write in a clear, empathetic, and natural tone (like the citizen is explaining their problem).
 Keep it to 3–5 sentences, and base your description on the actual photo content.
-                                        `
-                                    },
-                                    { inline_data: { mime_type: mimeType, data: base64Image.split(",")[1] } }
+                                    `
+                                    }
+                                ]
+                            },
+                            {
+                                parts: [
+                                    {
+                                        inline_data: {
+                                            mime_type: mimeType,
+                                            data: base64Image.split(",")[1]
+                                        }
+                                    }
                                 ]
                             }
                         ]
