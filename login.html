@@ -29,7 +29,8 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden; /* Prevent horizontal scroll, allow vertical */
+    box-sizing: border-box;
 }
 
 @keyframes gradientBG {
@@ -236,10 +237,67 @@ body {
 }
 
 /* --- Responsive --- */
-@media(max-width:900px){
-    .login-container { flex-direction: column; }
-    .graphic-panel, .login-panel { width: 100%; padding: 30px; }
-    .graphic-panel h1 { font-size: 28px; }
+@media(max-width: 900px){
+    .login-container {
+        flex-direction: column;
+        margin: 20px 0; /* Add vertical margin for scroll */
+        height: auto;
+    }
+    .graphic-panel, .login-panel {
+        width: 100%;
+        box-sizing: border-box; /* Important for correct padding calculation */
+    }
+    .graphic-panel {
+        padding: 50px 30px;
+    }
+    .graphic-panel h1 {
+        font-size: 28px;
+    }
+}
+
+@media(max-width: 480px) {
+    body {
+        /* Align to top to make scrolling feel natural */
+        align-items: flex-start;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    .login-container {
+        max-width: 90%;
+    }
+
+    .graphic-panel, .login-panel {
+        padding: 30px 20px;
+    }
+
+    .emblem {
+        width: 120px;
+        height: 120px;
+    }
+
+    .emblem::after {
+        top: -4px; left: -4px; right: -4px; bottom: -4px;
+    }
+
+    .header h2 {
+        font-size: 24px;
+    }
+
+    .otp-container {
+        gap: 10px;
+    }
+
+    .otp-input {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 12px 0;
+    }
 }
 </style>
 </head>
@@ -248,7 +306,7 @@ body {
 <main class="login-container">
     <section class="graphic-panel">
         <h1>Your Voice, Your City</h1>
-        <p>Be a responsible citizen. Report issues and help build a clean and healthy society. Every report counts!</p>
+        <p>Be a responsible citizen. Report issues and support to build a clean and healthy society. Every issue raised counts..!</p>
     </section>
 
     <section class="login-panel">
