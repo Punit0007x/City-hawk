@@ -116,11 +116,8 @@
                               <option value="or" class="text-black">ଓଡ଼ିଆ</option>
                             </select>
                         </div>
-                        <nav class="hidden md:flex items-center space-x-4">
-                            <a href="my_report.html" class="nav-link font-medium hover:text-orange-200 transition-colors">My Reports</a>
-                            <a href="#" class="font-medium hover:text-orange-200 transition-colors" data-translate-key="profile">Profile</a>
-                            <a href="#" id="logoutBtn" class="py-2 px-4 text-sm font-bold rounded-lg transition-transform duration-200 bg-white/20 hover:bg-white/30 hover:scale-105" data-translate-key="logout">Logout</a>
-                        </nav>
+                        <a href="home.html" class="text-sm font-semibold hover:underline">⬅ Home</a>
+                        <a href="#" id="logoutBtn" class="text-sm font-semibold hover:underline">Logout</a>
                     </div>
                     <div id="datetime" class="text-xs font-medium text-orange-100 mt-1 text-center md:text-right"></div>
                 </div>
@@ -152,21 +149,46 @@
                     <h2 class="text-2xl font-bold mb-4 tracking-tight" data-translate-key="reportIssue">Report an Issue <span class="text-red-500">*</span></h2>
                     <form id="reportForm" aria-label="Report civic issue form">
                         <div id="issueCategories" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-6">
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Potholes"><span class="text-3xl">🕳️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="pothole">Pothole</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Garbage"><span class="text-3xl">🗑️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="garbage">Garbage</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Streetlights"><span class="text-3xl">💡</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="streetlights">Streetlights</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Water Leak"><span class="text-3xl">💧</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="waterLeak">Water Leak</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Garbage Overflow"><span class="text-3xl">🗑️⬆️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="overflow">Overflow</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Illegal Dumping"><span class="text-3xl">🚯</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="dumping">Dumping</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Encroachments"><span class="text-3xl">🚧</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="encroachment">Encroachment</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Damaged Property"><span class="text-3xl">🏚️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="damage">Damage</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Blocked Drains"><span class="text-3xl">🚱</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="drains">Drains</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Open Sewage"><span class="text-3xl">🦠</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="sewage">Sewage</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Power Outage"><span class="text-3xl">⚡</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="powerOutage">Power Outage</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Broken Public Toilets"><span class="text-3xl">🚻❌</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="toilets">Toilets</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Accident-prone Zone"><span class="text-3xl">⚠️</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="dangerZone">Danger Zone</span></button>
-                           <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Other"><span class="text-3xl">❓</span><span class="mt-2 text-xs text-center font-semibold" data-translate-key="other">Other</span></button>
-                        </div>
+    
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Pothole">
+        <span class="text-3xl">🕳️</span>
+        <span class="mt-2 text-xs text-center font-semibold">Pothole</span>
+    </button>
+
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Waste Management">
+        <span class="text-3xl">🗑️</span>
+        <span class="mt-2 text-xs text-center font-semibold">Garbage</span>
+    </button>
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Waste Management">
+        <span class="text-3xl">🗑️⬆️</span>
+        <span class="mt-2 text-xs text-center font-semibold">Overflow</span>
+    </button>
+     <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Waste Management">
+        <span class="text-3xl">🚮</span>
+        <span class="mt-2 text-xs text-center font-semibold">Dumping</span>
+    </button>
+
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Broken Streetlight">
+        <span class="text-3xl">💡</span>
+        <span class="mt-2 text-xs text-center font-semibold">Streetlight</span>
+    </button>
+    
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Water Leakage">
+        <span class="text-3xl">💧</span>
+        <span class="mt-2 text-xs text-center font-semibold">Water Leak</span>
+    </button>
+
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Traffic Signal Issue">
+        <span class="text-3xl">🚦</span>
+        <span class="mt-2 text-xs text-center font-semibold">Traffic Signal</span>
+    </button>
+    
+    <button type="button" class="issue-btn border border-gray-200 bg-white hover:border-orange-400 p-3 rounded-lg flex flex-col items-center justify-center transition-all duration-300 transform hover:-translate-y-1" data-category="Park Maintenance">
+        <span class="text-3xl">🌳</span>
+        <span class="mt-2 text-xs text-center font-semibold">Park Issue</span>
+    </button>
+
+</div>
                         <input type="hidden" id="selectedCategory" name="issueCategory" required>
                         
                         <label for="issueDescription" class="block text-sm font-medium text-gray-700">Issue Description <span class="text-red-500">*</span></label>
@@ -178,8 +200,14 @@
                         </label>
                         <input type="file" accept="image/*" capture="environment" id="issuePhoto" name="issuePhoto" class="hidden" multiple/>
                         <div id="photoPreview" class="mt-4 flex flex-wrap gap-2"></div>
+                        <button 
+                            type="button" 
+                            id="generateDescBtn" 
+                            class="mt-2 px-4 py-2 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors">
+                            ✨ Generate AI Description
+                    </button>
                         
-                        <button type="button" id="generateDescBtn" class="mt-4 w-full py-2.5 px-4 text-sm font-bold rounded-lg transition-all duration-300 bg-slate-700 hover:bg-slate-800 text-white disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 disabled:scale-100" disabled>✨ Generate Description with AI</button>
+                        <!-- AI Description Button and Suggestion Box removed -->
                          
                         <div class="relative mt-4 p-4 border rounded-lg bg-slate-50">
                             <h3 class="text-lg font-semibold mb-2" data-translate-key="setLocation">Set Location</h3>
@@ -225,6 +253,55 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // --- Inject dummy reports into localStorage if none exist ---
+        // Ensure dummy reports exist if none are saved
+        if (!localStorage.getItem("reports") || JSON.parse(localStorage.getItem("reports")).length === 0) {
+            const dummyReports = [
+                {
+                    issueCategory: "Pothole",
+                    issueDescription: "Big pothole on the main road causing traffic jams.",
+                    state: "Delhi",
+                    district: "Central Delhi",
+                    trackingId: "REP-20250920-PO001",
+                    status: "pending",
+                    latitude: "28.6562",
+                    longitude: "77.2167",
+                    photos: [
+                        { name: "pothole.jpg", dataUrl: "https://via.placeholder.com/400x250?text=Pothole" }
+                    ],
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    issueCategory: "Garbage",
+                    issueDescription: "Overflowing garbage bin near market area.",
+                    state: "Maharashtra",
+                    district: "Mumbai",
+                    trackingId: "REP-20250920-GB002",
+                    status: "inprogress",
+                    latitude: "19.0760",
+                    longitude: "72.8777",
+                    photos: [
+                        { name: "garbage.jpg", dataUrl: "https://via.placeholder.com/400x250?text=Garbage" }
+                    ],
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    issueCategory: "Streetlight",
+                    issueDescription: "Streetlight not working for the past week.",
+                    state: "Karnataka",
+                    district: "Bengaluru Urban",
+                    trackingId: "REP-20250920-SL003",
+                    status: "resolved",
+                    latitude: "12.9716",
+                    longitude: "77.5946",
+                    photos: [
+                        { name: "streetlight.jpg", dataUrl: "https://via.placeholder.com/400x250?text=Streetlight" }
+                    ],
+                    timestamp: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem("reports", JSON.stringify(dummyReports));
+        }
         // --- DOM ELEMENTS ---
         const datetimeDiv = document.getElementById('datetime');
         const reportForm = document.getElementById('reportForm');
@@ -232,7 +309,6 @@
         const selectedCategoryInput = document.getElementById('selectedCategory');
         const nearbyIssuesDiv = document.getElementById('nearbyIssues');
         const issueDescription = document.getElementById('issueDescription');
-        const generateDescBtn = document.getElementById('generateDescBtn');
         const issuePhotoInput = document.getElementById('issuePhoto');
         const photoPreview = document.getElementById('photoPreview');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -256,6 +332,8 @@
         const INDIA_CENTER_COORDS = [22.5937, 78.9629]; 
         const INDIA_WIDE_ZOOM = 5;
         let uploadedFiles = [];
+        // For new upload/AI flow:
+        let currentUpload = null;
         let nearbyIssuesData = [];
 
         // --- MOCK DATA ---
@@ -543,139 +621,277 @@
         }
 
 
+        // Long detailed descriptions per category (10–20 lines each, multiple variants)
+        const longDescriptions = {
+            "Pothole": [
+                `A massive pothole has formed on the main road, spanning nearly three feet in diameter and several inches deep. This pothole disrupts the smooth flow of traffic and poses a significant risk to two-wheelers and smaller vehicles. During peak traffic hours, drivers swerve dangerously to avoid the hazard, increasing the likelihood of accidents. Rainwater often collects in the pothole, making it difficult for commuters to gauge its depth and worsening the risk. 
+
+Residents have expressed frustration, stating that multiple complaints have been ignored by municipal authorities. Delivery vehicles and school buses frequently get delayed due to bottlenecks caused by this obstruction. Nighttime visibility makes the pothole even more dangerous, especially since there are no warning signs or barricades. Emergency vehicles face delays, which could prove critical in urgent situations. 
+
+Local shopkeepers nearby report a decline in customers as drivers avoid the area. The prolonged existence of this pothole raises questions about the efficiency of road maintenance services. Continuous wear and tear from heavy trucks has further expanded the pothole, making it more hazardous with time. The longer this issue remains unresolved, the more costly and time-consuming the eventual repair will become. Residents are now demanding a long-term resurfacing of the road, not just patchwork fixes.`,
+                `There are multiple potholes scattered across the road leading to the bus depot. Motorcyclists zigzag dangerously to avoid them, while four-wheelers frequently suffer tire damage. During rains, these potholes get filled with muddy water, making them invisible to unsuspecting commuters. The situation is especially critical for ambulances, which lose valuable time navigating these broken patches. 
+
+Residents have staged several protests demanding immediate road repair, but no visible action has been taken. Many small businesses along this route complain of declining sales as delivery services refuse to enter the locality. Traffic jams are now routine, and school buses often arrive late. 
+
+The continued neglect of these potholes is not just a minor inconvenience but a serious public safety hazard. Authorities are being accused of negligence, and public outrage is growing. If not addressed immediately, these potholes may lead to fatal accidents and long-term infrastructural damage.`,
+                `The pothole near the community center has become so large that locals now refer to it as a “crater.” Vehicles often get stuck, and tow services are frequently called to rescue two-wheelers. Children walking to school are forced to walk on the busy main road to avoid the pothole, putting them in grave danger. Rainwater accumulation has made the area prone to mosquito breeding, raising concerns about diseases like dengue. 
+
+Local shopkeepers claim that sales have dropped as customers refuse to risk their vehicles on this road. Despite repeated social media campaigns tagging civic authorities, no repair work has been initiated. Community activists argue that funds for road repair are being misused elsewhere. 
+
+If not repaired soon, this pothole could damage underground pipelines and worsen flooding during rains. Residents are now organizing a signature campaign to escalate the issue further.`
+            ],
+            "Garbage": [
+                `Overflowing garbage bins have become a daily sight in the marketplace. Waste is spilling over onto footpaths, creating both an eyesore and a health hazard. Flies and stray animals scatter the garbage further into the streets, making the area extremely unhygienic. 
+
+The foul odor spreads into nearby shops, forcing business owners to keep doors shut throughout the day. Customers complain of nausea while passing by, and many prefer to shop elsewhere. Children walking home from school often step on rotting food waste, increasing the risk of infections. 
+
+Residents are frustrated as repeated complaints to the sanitation department have gone unanswered. The rainy season has worsened the problem, with clogged drains leading to waterlogging. Pools of stagnant, garbage-filled water have become breeding grounds for mosquitoes. 
+
+The neglect of proper waste disposal has now reached a point where urgent intervention is necessary. The situation is beginning to impact local trade and daily life heavily.`,
+                `The garbage dump near the bus stand has grown steadily over the past month. Plastic, food waste, and hazardous materials are lying in the open, creating unbearable stench. Stray dogs and cows are constantly seen scavenging, spreading the waste across the road. 
+
+During rush hour, the pile of garbage obstructs bus passengers from entering or exiting comfortably. Locals complain that the accumulation of waste has attracted rodents, increasing the risk of plague and other diseases. Shops in the area are losing customers as people avoid the unhygienic surroundings. 
+
+Municipal staff have been informed multiple times, but no visible cleaning has been carried out. Community leaders warn that if the issue persists, it may lead to large-scale protests.`,
+                `Uncollected garbage has piled up in the residential colony for nearly two weeks. Food waste, plastic bags, and construction debris are strewn across the streets. The stench makes it nearly impossible for residents to keep their windows open. 
+
+Stray animals rummage through the piles, worsening the mess. Rainwater has turned the garbage heap into a sludge that blocks drains and causes flooding. Parents fear their children may fall sick due to the unhygienic environment. 
+
+Despite repeated requests, garbage collection trucks have not arrived. The lack of response from authorities has eroded residents’ trust in civic services.`
+            ],
+            "Streetlight": [
+                `A key streetlight on the main residential road has been dysfunctional for nearly two weeks. As a result, the entire lane remains in complete darkness after sunset. The absence of lighting makes it dangerous for schoolchildren, women, and senior citizens. 
+
+Local residents claim that cases of chain snatching and petty theft have increased due to the lack of illumination. Commuters on two-wheelers find it extremely difficult to navigate potholes and speed breakers in the dark. Heavy rainfall further worsens visibility, making accidents almost inevitable. 
+
+Despite lodging multiple complaints, the electricity board has not taken any steps for repair. The issue has been raised in community meetings, but authorities continue to ignore the matter. Shopkeepers in the area say that customers avoid visiting after dark, impacting their sales drastically.`,
+                `The entire stretch leading to the railway station has no functioning streetlights. This has resulted in numerous accidents, as drivers struggle to spot pedestrians in time. 
+
+Many auto-rickshaw drivers refuse to take passengers through the area at night, citing safety risks. Residents report that crime incidents have increased significantly due to the lack of illumination. Several petitions have been filed demanding urgent repair, but no concrete steps have been taken. 
+
+The road is one of the busiest in the city, making this issue even more pressing. The delay in fixing the streetlights has left residents angry and worried.`,
+                `Multiple streetlights in the neighborhood park have stopped working. The park, which is usually bustling with children and senior citizens, now lies deserted after sunset. 
+
+Parents feel unsafe allowing their children to play in the poorly lit park. Incidents of vandalism have increased, and residents have spotted suspicious activity in the evenings. The lack of adequate lighting also makes the park a potential hiding spot for criminals. 
+
+Repeated appeals to the municipal corporation have gone unanswered. The once lively public space is now avoided by most locals.`
+            ],
+            "Water Leakage": [
+                `A major water leakage from an underground pipeline near the park has been ongoing for over ten days. Thousands of liters of potable water are wasted daily, pooling onto the streets and damaging the road surface. Pedestrians and two-wheelers are frequently seen slipping on the wet surface. 
+
+Locals are frustrated by the wastage at a time when the city is already facing water scarcity. The leakage has created large puddles, becoming a breeding ground for mosquitoes. Complaints have been made to the water supply department, but only temporary patchwork has been attempted. 
+
+The leakage is so severe that small cracks have appeared on adjacent house walls due to constant moisture. Shopkeepers in the area complain of reduced foot traffic, as customers avoid walking on the slippery road. Children playing nearby are at constant risk of slipping and injuring themselves. 
+
+The community has demanded a permanent solution rather than repeated temporary fixes.`,
+                `A cracked water pipeline near the hospital has been leaking continuously, making the entrance road nearly unusable. Patients and ambulances face serious difficulty entering the hospital premises. Residents fear the leakage may lead to further damage, weakening the road foundation. 
+
+The foul smell of stagnant water has spread into the hospital, creating an unhygienic environment for patients. Doctors have raised alarms about the risks of infection. Despite urgent complaints, no repair work has been carried out yet. 
+
+This problem is not only about water wastage but also about public health and safety.`,
+                `Water leakage from an overhead tank has resulted in constant dripping onto the street below. Over time, the leakage has eroded the road surface, forming potholes. Vehicles skid while braking suddenly, leading to several minor accidents. 
+
+Residents have placed sandbags to divert the flow, but the problem persists. Stagnant water has become a breeding ground for insects, making evenings unbearable. Complaints on the civic helpline have gone unanswered. 
+
+People fear that the structure of the tank may weaken if the leakage is not fixed immediately.`
+            ]
+        };
+
+        // 1. Predefined descriptions for auto-fill
+        const predefinedDescriptions = {
+            "Pothole": "Large pothole creating traffic congestion and risk for vehicles.",
+            "Garbage": "Garbage bins overflowing, causing unhygienic conditions in the area.",
+            "Streetlight": "Streetlight not functioning at night, leading to unsafe conditions.",
+            "Water Leakage": "Water leakage from pipeline causing wastage and road damage.",
+            "Traffic Signal": "Traffic signal not working, causing confusion at junction."
+        };
+
+        // 2. Updated handleCategorySelect
         const handleCategorySelect = (button) => {
             issueButtons.forEach(btn => btn.classList.remove('selected'));
             button.classList.add('selected');
-            selectedCategoryInput.value = button.dataset.category;
+            if (selectedCategoryInput) {
+                selectedCategoryInput.value = button.dataset.category;
+            }
+            // No AI button to enable
+            issueDescription.value = "";
+            issueDescription.focus();
         };
         
-        const handlePhotoUpload = (event) => {
-            const files = event.target.files;
-            if (files.length + uploadedFiles.length > 5) {
-                showNotification('You can only upload a maximum of 5 photos.', 'error');
-                return;
+        // Enhanced handlePhotoUpload: EXIF GPS extraction and AI button enable
+        function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files).slice(0, 5);
+            uploadedFiles = [];
+            photoPreview.innerHTML = "";
+            // Enable/disable AI button
+            if (files.length > 0) {
+                generateDescBtn.disabled = false;
+            } else {
+                generateDescBtn.disabled = true;
             }
-
-            Array.from(files).forEach(file => {
+            let triedGeolocation = false;
+            let exifLocationFound = false;
+            files.forEach((file, idx) => {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    const fileId = Date.now() + "_" + file.name; // Create a unique ID
-                    uploadedFiles.push({ id: fileId, file: file });
-
+                reader.onload = function(e) {
+                    const fileId = Date.now() + "_" + file.name;
+                    const uploadObj = {
+                        id: fileId,
+                        name: file.name,
+                        dataUrl: e.target.result
+                    };
+                    uploadedFiles.push(uploadObj);
                     const previewContainer = document.createElement('div');
                     previewContainer.className = 'photo-preview-item w-24 h-24';
                     previewContainer.innerHTML = `
                         <img src="${e.target.result}" class="w-full h-full object-cover rounded-md border"/>
-                        <button type="button" class="remove-photo-btn" data-file-id="${fileId}">&times;</button>
                     `;
-                    // --- Add coordinates div ---
-                    const coordDiv = document.createElement('div');
-                    coordDiv.className = 'text-[10px] text-gray-600 mt-1 text-center';
-                    coordDiv.innerText = 'Locating...';
-                    previewContainer.appendChild(coordDiv);
-                    // --- End coordinates div ---
                     photoPreview.appendChild(previewContainer);
-
-                    // Add event listener to the new remove button
-                    previewContainer.querySelector('.remove-photo-btn').addEventListener('click', (e) => {
-                        const idToRemove = e.target.dataset.fileId;
-                        uploadedFiles = uploadedFiles.filter(f => f.id != idToRemove);
-                        e.target.parentElement.remove();
-                        generateDescBtn.disabled = uploadedFiles.length === 0;
-                    });
-
-                    // --- Try to extract GPS data from photo (moved inside reader.onload) ---
-                    EXIF.getData(file, function() {
-                        const lat = EXIF.getTag(this, "GPSLatitude");
-                        const lon = EXIF.getTag(this, "GPSLongitude");
-
-                        if (lat && lon) {
-                            const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
-                            const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
-                            const decimalLat = (lat[0] + lat[1]/60 + lat[2]/3600) * (latRef === "N" ? 1 : -1);
-                            const decimalLon = (lon[0] + lon[1]/60 + lon[2]/3600) * (lonRef === "E" ? 1 : -1);
-
-                            // --- Update coordDiv with EXIF location ---
-                            coordDiv.innerText = `Lat: ${decimalLat.toFixed(5)}, Lon: ${decimalLon.toFixed(5)}`;
-                            // --- End update coordDiv ---
-                            showNotification('Photo location extracted from metadata! Updating map.', 'info');
-                            map.setView([decimalLat, decimalLon], 17);
-                            marker.setLatLng([decimalLat, decimalLon]);
-                            updateLocationDetails(decimalLat, decimalLon);
-                            // Do NOT call describeImageWithAI here
-                        } else {
-                            // No EXIF GPS → get current location instead
-                            if (navigator.geolocation) {
-                                navigator.geolocation.getCurrentPosition(position => {
-                                    const { latitude, longitude } = position.coords;
-                                    // --- Update coordDiv with geolocation fallback ---
-                                    coordDiv.innerText = `Lat: ${latitude.toFixed(5)}, Lon: ${longitude.toFixed(5)}`;
-                                    // --- End update coordDiv ---
-                                    showNotification('Geo-tagged photo with current location!', 'success');
-                                    map.setView([latitude, longitude], 17);
-                                    marker.setLatLng([latitude, longitude]);
-                                    updateLocationDetails(latitude, longitude);
-                                    // Do NOT call describeImageWithAI here
-                                }, () => {
-                                    coordDiv.innerText = 'Location unavailable';
-                                    showNotification('Could not fetch current location for this photo.', 'error');
-                                });
-                            } else {
-                                coordDiv.innerText = 'Location unavailable';
-                            }
-                        }
-                    });
-                    // --- End EXIF/geo logic ---
                 };
                 reader.readAsDataURL(file);
-            });
-            // Always set generateDescBtn enabled/disabled after processing files
-            generateDescBtn.disabled = uploadedFiles.length === 0;
-            // --- Automatically call Gemini AI description generation if any file is uploaded ---
-            if (uploadedFiles.length > 0) {
-                generateDescriptionWithGemini();
-            }
-        };
-        
-        // --- NEW DYNAMIC GEMINI API (AI-powered for uploaded photos) ---
-        const generateDescriptionWithGemini = async () => {
-            const selectedCategory = selectedCategoryInput.value;
-            const imageCount = uploadedFiles.length;
-
-            if (imageCount === 0) {
-                showNotification('Please upload a photo first.', 'error');
-                return;
-            }
-            if (!selectedCategory) {
-                showNotification('Please select an issue category first.', 'error');
-                return;
-            }
-
-            generateDescBtn.disabled = true;
-            generateDescBtn.textContent = '🧠 Analyzing...';
-
-            try {
-                // For each uploaded file, read as base64 and call describeImageWithAI
-                const descriptions = [];
-                for (const fileObj of uploadedFiles) {
-                    const file = fileObj.file;
-                    const base64 = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => resolve(e.target.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
-                    const desc = await describeImageWithAI(base64, file.type);
-                    descriptions.push(desc);
+                // EXIF GPS extraction (only for the first file)
+                if (idx === 0) {
+                    const exifReader = new FileReader();
+                    exifReader.onload = function(ev) {
+                        try {
+                            // Try to get GPS from File object
+                            EXIF.getData(file, function() {
+                                const gpsLat = EXIF.getTag(this, "GPSLatitude");
+                                const gpsLatRef = EXIF.getTag(this, "GPSLatitudeRef");
+                                const gpsLng = EXIF.getTag(this, "GPSLongitude");
+                                const gpsLngRef = EXIF.getTag(this, "GPSLongitudeRef");
+                                if (gpsLat && gpsLatRef && gpsLng && gpsLngRef) {
+                                    function dmsToDecimal(dms, ref) {
+                                        const [d, m, s] = dms;
+                                        let dec = d + m/60 + s/3600;
+                                        if (ref === "S" || ref === "W") dec = -dec;
+                                        return dec;
+                                    }
+                                    const lat = dmsToDecimal(gpsLat, gpsLatRef);
+                                    const lng = dmsToDecimal(gpsLng, gpsLngRef);
+                                    exifLocationFound = true;
+                                    // Set location fields and move map pin
+                                    latitudeInput.value = lat;
+                                    longitudeInput.value = lng;
+                                    coordsDisplay.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lng.toFixed(5)}`;
+                                    if (typeof map !== "undefined" && typeof marker !== "undefined") {
+                                        map.setView([lat, lng], 17);
+                                        if (!marker) {
+                                            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                                            marker.on('dragend', (event) => {
+                                                const position = marker.getLatLng();
+                                                updateLocationDetails(position.lat, position.lng);
+                                            });
+                                        } else {
+                                            marker.setLatLng([lat, lng]);
+                                        }
+                                    }
+                                    // Reverse geocode to fill address
+                                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                                        .then(resp => resp.json())
+                                        .then(data => {
+                                            if (data && data.display_name) {
+                                                fullAddressInput.value = data.display_name;
+                                                selectedAddressDiv.textContent = `Selected: ${data.display_name}`;
+                                            }
+                                        });
+                                    fetchNearbyIssues(lat, lng);
+                                } else {
+                                    // No EXIF GPS found, try geolocation if not already tried
+                                    if (!triedGeolocation) {
+                                        triedGeolocation = true;
+                                        if (navigator.geolocation) {
+                                            navigator.geolocation.getCurrentPosition(
+                                                function(position) {
+                                                    const lat = position.coords.latitude;
+                                                    const lng = position.coords.longitude;
+                                                    latitudeInput.value = lat;
+                                                    longitudeInput.value = lng;
+                                                    coordsDisplay.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lng.toFixed(5)}`;
+                                                    if (typeof map !== "undefined") {
+                                                        map.setView([lat, lng], 17);
+                                                        if (!marker) {
+                                                            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                                                            marker.on('dragend', (event) => {
+                                                                const position = marker.getLatLng();
+                                                                updateLocationDetails(position.lat, position.lng);
+                                                            });
+                                                        } else {
+                                                            marker.setLatLng([lat, lng]);
+                                                        }
+                                                    }
+                                                    // Reverse geocode to fill address
+                                                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                                                        .then(resp => resp.json())
+                                                        .then(data => {
+                                                            if (data && data.display_name) {
+                                                                fullAddressInput.value = data.display_name;
+                                                                selectedAddressDiv.textContent = `Selected: ${data.display_name}`;
+                                                            }
+                                                        });
+                                                    fetchNearbyIssues(lat, lng);
+                                                },
+                                                function(error) {
+                                                    console.error("Geolocation error:", error);
+                                                    showNotification('Could not determine device location.', 'error');
+                                                }
+                                            );
+                                        } else {
+                                            showNotification('Geolocation is not supported by this browser.', 'error');
+                                        }
+                                    }
+                                }
+                            });
+                        } catch (err) {
+                            // ignore EXIF errors, try geolocation if not already tried
+                            if (!triedGeolocation) {
+                                triedGeolocation = true;
+                                if (navigator.geolocation) {
+                                    navigator.geolocation.getCurrentPosition(
+                                        function(position) {
+                                            const lat = position.coords.latitude;
+                                            const lng = position.coords.longitude;
+                                            latitudeInput.value = lat;
+                                            longitudeInput.value = lng;
+                                            coordsDisplay.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lng.toFixed(5)}`;
+                                            if (typeof map !== "undefined") {
+                                                map.setView([lat, lng], 17);
+                                                if (!marker) {
+                                                    marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                                                    marker.on('dragend', (event) => {
+                                                        const position = marker.getLatLng();
+                                                        updateLocationDetails(position.lat, position.lng);
+                                                    });
+                                                } else {
+                                                    marker.setLatLng([lat, lng]);
+                                                }
+                                            }
+                                            // Reverse geocode to fill address
+                                            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                                                .then(resp => resp.json())
+                                                .then(data => {
+                                                    if (data && data.display_name) {
+                                                        fullAddressInput.value = data.display_name;
+                                                        selectedAddressDiv.textContent = `Selected: ${data.display_name}`;
+                                                    }
+                                                });
+                                            fetchNearbyIssues(lat, lng);
+                                        },
+                                        function(error) {
+                                            console.error("Geolocation error:", error);
+                                            showNotification('Could not determine device location.', 'error');
+                                        }
+                                    );
+                                } else {
+                                    showNotification('Geolocation is not supported by this browser.', 'error');
+                                }
+                            }
+                        }
+                    };
+                    exifReader.readAsArrayBuffer(file);
                 }
-                issueDescription.value = descriptions.join('\n\n');
-                showNotification('AI description generated from photo(s)!', 'success');
-            } catch (err) {
-                showNotification('Failed to generate AI description.', 'error');
-            }
-            generateDescBtn.disabled = false;
-            generateDescBtn.textContent = '✨ Generate Description with AI';
-        };
+            });
+        }
         
         const summarizeNearbyIssues = () => {
              if (nearbyIssuesData.length === 0) {
@@ -723,29 +939,141 @@
         };
 
 
+        // --- AI Description Button Logic ---
+        // Enable/disable AI button on load
+        const generateDescBtn = document.getElementById('generateDescBtn');
+        if (generateDescBtn) {
+            generateDescBtn.disabled = true;
+        }
+
+        // AI generate button logic
+        if (generateDescBtn) {
+            generateDescBtn.addEventListener('click', async function() {
+                if (!issuePhotoInput.files || issuePhotoInput.files.length === 0) {
+                    showNotification('Please upload a photo to use AI description.', 'error');
+                    return;
+                }
+                // UI: Show loading spinner and disable button
+                const originalHTML = generateDescBtn.innerHTML;
+                generateDescBtn.disabled = true;
+                generateDescBtn.innerHTML = `<svg class="inline animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Generating...`;
+                const file = issuePhotoInput.files[0];
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const base64Data = e.target.result.split(',')[1];
+                        // Debug: log base64 length
+                        console.log('[AI Generate] base64 length:', base64Data.length);
+                        // POST to backend
+                        const resp = await fetch('http://127.0.0.1:5000/analyze-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image_data: base64Data })
+                        });
+                        // Debug: log response status
+                        console.log('[AI Generate] fetch response status:', resp.status);
+                        let respBodyText;
+                        try {
+                            respBodyText = await resp.clone().text();
+                            console.log('[AI Generate] fetch response body:', respBodyText);
+                        } catch (e) {
+                            console.log('[AI Generate] Could not read response body');
+                        }
+                        if (!resp.ok) {
+                            let errorMsg = 'Failed to get AI description';
+                            try {
+                                const errData = JSON.parse(respBodyText);
+                                if (errData && errData.error) errorMsg = errData.error;
+                            } catch {}
+                            showNotification(errorMsg, 'error');
+                            return;
+                        }
+                        let data;
+                        try {
+                            data = JSON.parse(respBodyText);
+                        } catch (e) {
+                            data = await resp.json();
+                        }
+                        if (data && data.description) {
+                            issueDescription.value = data.description;
+                            showNotification('AI description generated!', 'success');
+                        } else if (data && data.error) {
+                            showNotification('AI error: ' + data.error, 'error');
+                        } else {
+                            showNotification('No description returned from AI.', 'error');
+                        }
+                    } catch (err) {
+                        console.error('[AI Generate] Error:', err);
+                        showNotification('AI description failed: ' + (err && err.message ? err.message : err), 'error');
+                    } finally {
+                        generateDescBtn.disabled = false;
+                        generateDescBtn.innerHTML = originalHTML;
+                    }
+                };
+                reader.onerror = function(e) {
+                    console.error('[AI Generate] FileReader error:', e);
+                    showNotification('Could not read photo for AI analysis.', 'error');
+                    generateDescBtn.disabled = false;
+                    generateDescBtn.innerHTML = originalHTML;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         // --- EVENT LISTENERS ---
-        reportForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(reportForm);
-            const data = Object.fromEntries(formData.entries());
-            data.photos = uploadedFiles.map(f => f.file.name); // Just get names for simulation
+        // --- Save new report to localStorage with images and details ---
+        if (reportForm) {
+            reportForm.addEventListener("submit", (e) => {
+                e.preventDefault();
 
-            if (!data.issueCategory) {
-                showNotification('Please select an issue category.', 'error');
-                return;
-            }
-            if (!data.latitude || !data.longitude) {
-                showNotification('Please set a location on the map.', 'error');
-                return;
-            }
-
-            console.log('Report Submitted:', data);
-            showNotification('Issue reported successfully!', 'success');
-            reportForm.reset();
-            photoPreview.innerHTML = '';
-            uploadedFiles = [];
-            issueButtons.forEach(btn => btn.classList.remove('selected'));
-        });
+                const issueCategory = selectedCategoryInput.value;
+                const issueDescriptionVal = issueDescription.value.trim();
+                const state = stateSelect.value;
+                const district = districtSelect.value;
+                const latitude = latitudeInput.value;
+                const longitude = longitudeInput.value;
+                // Validate required fields
+                if (!issueCategory || !issueDescriptionVal || !state || !district || !latitude || !longitude) {
+                    showNotification("Please fill all required fields before submitting.", "error");
+                    return;
+                }
+                // Tracking ID with random 3-digit suffix for uniqueness
+                const trackingId = `REP-${Date.now()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+                // Prepare report object with updated schema for compatibility
+                const report = {
+                    trackingId: trackingId,
+                    issueCategory: issueCategory,
+                    issueDescription: issueDescriptionVal,
+                    latitude: latitude,
+                    longitude: longitude,
+                    timestamp: Date.now(),
+                    status: 'submitted',
+                    photos: uploadedFiles.map(f => ({ name: f.name, dataUrl: f.dataUrl })) || [],
+                    feedback: '',
+                    rating: 0,
+                    state: state,
+                    district: district
+                };
+                // Load existing reports from localStorage (if any)
+                let reportsArray = [];
+                try {
+                    const stored = localStorage.getItem("reports");
+                    if (stored) {
+                        reportsArray = JSON.parse(stored);
+                        if (!Array.isArray(reportsArray)) reportsArray = [];
+                    }
+                } catch (err) {
+                    reportsArray = [];
+                }
+                reportsArray.push(report);
+                localStorage.setItem("reports", JSON.stringify(reportsArray));
+                showNotification(`Report submitted successfully! Tracking ID: ${trackingId}. <a href="my_reports.html" class="underline ml-2">View My Reports</a>`, "success");
+                // Clear form and preview
+                reportForm.reset();
+                photoPreview.innerHTML = "";
+                uploadedFiles = [];
+            });
+        }
 
         fullAddressInput.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
@@ -774,10 +1102,43 @@
         issuePhotoInput.addEventListener('change', handlePhotoUpload);
         locateMeBtn.addEventListener('click', locateUser);
         resetMapBtn.addEventListener('click', () => initMap(INDIA_CENTER_COORDS, INDIA_WIDE_ZOOM));
-        stateSelect.addEventListener('change', (e) => populateDistricts(e.target.value));
+        stateSelect.addEventListener('change', (e) => {
+            populateDistricts(e.target.value);
+            // Shift map to selected state center if available
+            const stateName = e.target.value;
+            if (stateName && stateDistrictData[stateName]) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(stateName + ', India')}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data[0]) {
+                            const { lat, lon } = data[0];
+                            map.setView([parseFloat(lat), parseFloat(lon)], 7);
+                            marker.setLatLng([parseFloat(lat), parseFloat(lon)]);
+                            updateLocationDetails(parseFloat(lat), parseFloat(lon));
+                        }
+                    });
+            }
+        });
+        // Add district change event to shift map to district
+        districtSelect.addEventListener('change', (e) => {
+            const stateName = stateSelect.value;
+            const districtName = e.target.value;
+            if (stateName && districtName) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(districtName + ', ' + stateName + ', India')}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data[0]) {
+                            const { lat, lon } = data[0];
+                            map.setView([parseFloat(lat), parseFloat(lon)], 11);
+                            marker.setLatLng([parseFloat(lat), parseFloat(lon)]);
+                            updateLocationDetails(parseFloat(lat), parseFloat(lon));
+                        }
+                    });
+            }
+        });
         languageSelect.addEventListener('change', (e) => updateUIWithTranslations(e.target.value));
         summarizeIssuesBtn.addEventListener('click', summarizeNearbyIssues);
-        generateDescBtn.addEventListener('click', generateDescriptionWithGemini);
+        // AI button removed, so no event listener for generateDescBtn
         issueButtons.forEach(button => {
             button.addEventListener('click', () => handleCategorySelect(button));
         });
@@ -801,6 +1162,8 @@
         initMap(INDIA_CENTER_COORDS, INDIA_WIDE_ZOOM);
         locateUser(); // Attempt to find user's location on page load
         updateUIWithTranslations(languageSelect.value);
+
+        // Removed code related to loading saved photos from localStorage.uploadedPhotos
     });
     // --- Enhanced generateDescriptionWithGemini function with randomized human-like samples ---
     async function generateDescriptionWithGemini() {
@@ -883,3 +1246,5 @@
 
 </body>
 </html>
+
+    
