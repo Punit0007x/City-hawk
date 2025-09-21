@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -107,14 +108,12 @@
     </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     let reports = [];
 
     // --- NORMALIZE REPORT SCHEMA --- //
     function normalizeReport(r) {
-        // ADD `solvedPhoto` to the schema
         return {
             trackingId: r.trackingId || ('TID-' + Date.now() + '-' + Math.floor(Math.random() * 1000)),
             issueCategory: r.issueCategory || r.category || 'General',
@@ -124,13 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
             timestamp: r.timestamp || Date.now(),
             status: r.status || 'submitted',
             photos: Array.isArray(r.photos) ? r.photos : [],
-            solvedPhoto: r.solvedPhoto || null, // <<< ADDED THIS LINE
+            solvedPhoto: (typeof r.solvedPhoto === 'string' ? r.solvedPhoto : null), // ✅ fixed
             feedback: r.feedback || '',
             rating: r.rating || 0
         };
     }
 
-    // --- DATA INITIALIZATION --- //
     function setupInitialData() {
         const stored = localStorage.getItem('reports');
         try {
@@ -142,14 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- SAVE HELPER --- //
     function saveReports() {
         localStorage.setItem('reports', JSON.stringify(reports.map(normalizeReport)));
     }
 
     reports = setupInitialData();
 
-    // --- ELEMENT REFERENCES --- //
     const reportsContainer = document.getElementById('reportsContainer');
     const reportDetailContainer = document.getElementById('reportDetailContainer');
     const reportsListView = document.getElementById('reportsListView');
@@ -164,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportCategory = document.getElementById('reportCategory');
     const reportDescription = document.getElementById('reportDescription');
 
-    // --- UTILITY FUNCTIONS --- //
     const escapeHtml = (str) => String(str || '').replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'})[s]);
     const isImageFile = (name) => /\.(jpe?g|png|gif|bmp|webp|svg)$/i.test(name);
 
@@ -174,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resolved: { text: 'Resolved', color: 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-900 border border-emerald-200/50', icon: 'fa-solid fa-circle-check' }
     };
 
-    // --- VIEW MANAGEMENT --- //
     function switchView(viewToShow) {
         const viewToHide = viewToShow === 'list' ? reportDetailView : reportsListView;
         const targetView = viewToShow === 'list' ? reportsListView : reportDetailView;
@@ -189,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     }
 
-    // --- RENDERING LOGIC --- //
     function renderList() {
         reportsContainer.innerHTML = '';
         if (!reports.length) {
@@ -231,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const report = reports.find(x => x.trackingId === tid);
         if (!report) { switchView('list'); return; }
         reportDetailContainer.dataset.current = tid;
-        const { text, color, icon } = statusConfig[report.status] || statusConfig.submitted;
+        const { text, color } = statusConfig[report.status] || statusConfig.submitted;
         const images = report.photos?.filter(p => isImageFile(p.name)) || [];
 
         let photosHTML = '';
@@ -248,25 +241,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     </ul>
                 </div>`;
         }
-        
-        // ========================================================== //
-        // ========= START: CODE ADDED TO SHOW SOLVED PHOTO ========= //
-        // ========================================================== //
+
         let solvedPhotoHTML = '';
-        if (report.solvedPhoto) {
+        if (report.solvedPhoto && typeof report.solvedPhoto === 'string') {
             solvedPhotoHTML = `
                 <div class="mt-8">
                     <h4 class="font-semibold text-lg mb-3 text-gray-800">Resolution Photo</h4>
                     <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                        <img src="${report.solvedPhoto}" alt="Photo showing the resolved issue" class="w-full h-auto max-w-lg mx-auto rounded-lg shadow-md"/>
+                        <img src="${report.solvedPhoto}" alt="Resolved issue photo" class="w-full h-auto max-w-lg mx-auto rounded-lg shadow-md"/>
                         <p class="text-xs text-center mt-2 text-emerald-800 font-medium">This photo was uploaded by the department as proof of resolution.</p>
                     </div>
                 </div>
             `;
         }
-        // ======================================================== //
-        // ========= END: CODE ADDED TO SHOW SOLVED PHOTO ========= //
-        // ======================================================== //
 
         reportDetailContainer.innerHTML = `
             <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
@@ -281,7 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             
             ${photosHTML}
-            
             ${solvedPhotoHTML}
 
             <div class="mt-8 border-t pt-6">
@@ -290,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="mt-4 flex items-center space-x-3">
                     <label class="font-semibold text-gray-800">Rating:</label>
                     <div id="starRating" class="flex space-x-1 star-rating">
-                        ${[1, 2, 3, 4, 5].map(s => `
+                        ${[1,2,3,4,5].map(s => `
                             <button type="button" class="text-gray-300 hover:text-yellow-400" data-star="${s}" aria-label="Rate ${s} stars">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                             </button>`).join('')}
@@ -301,7 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
         attachDetailListeners(report);
     }
 
-    // --- MODAL MANAGEMENT --- //
     function showDeleteModal(tid) {
         const report = reports.find(r => r.trackingId === tid);
         if (!report) return;
@@ -310,10 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="mt-1"><strong>Category:</strong><span class="ml-2">${escapeHtml(report.issueCategory)}</span></p>`;
         deleteModal.classList.remove('hidden');
         deleteModal.classList.add('flex');
-        setTimeout(() => {
-            deleteModal.classList.remove('opacity-0');
-            deleteModal.querySelector('div').classList.remove('scale-95');
-        }, 10);
         const confirmHandler = () => {
             reports = reports.filter(r => r.trackingId !== tid);
             saveReports();
@@ -328,13 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function hideDeleteModal() {
-        deleteModal.classList.add('opacity-0');
-        deleteModal.querySelector('div').classList.add('scale-95');
-        setTimeout(() => {
-            deleteModal.classList.add('hidden');
-            deleteModal.classList.remove('flex');
-            deleteModal.classList.remove('opacity-0');
-        }, 300);
+        deleteModal.classList.add('hidden');
     }
 
     function attachListListeners() {
@@ -378,17 +353,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- ADD REPORT HANDLER --- //
     if (addReportForm) {
       addReportForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const category = reportCategory.value;
         const description = reportDescription.value.trim();
         if (!category || !description) return;
-        // Dummy lat/lon for now
         const lat = '0.0';
         const lon = '0.0';
-        // Create normalized report
         const newReport = normalizeReport({
           issueCategory: category,
           issueDescription: description,
@@ -408,10 +380,10 @@ document.addEventListener('DOMContentLoaded', () => {
     backToListBtn.addEventListener('click', () => switchView('list'));
     cancelDeleteBtn.addEventListener('click', hideDeleteModal);
 
-    // --- INITIAL RENDER --- //
     renderList();
 });
 </script>
 
 </body>
 </html>
+
