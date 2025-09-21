@@ -19,9 +19,8 @@ if not GEMINI_API_KEY:
 # --- Setup Gemini & Other Models ---
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
-processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
-blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
-
+processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
 # --- Flask App ---
 app = Flask(__name__)
 CORS(app)
