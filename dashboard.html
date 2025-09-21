@@ -962,45 +962,39 @@ People fear that the structure of the tank may weaken if the leakage is not fixe
                 reader.onload = async function(e) {
                     try {
                         const base64Data = e.target.result.split(',')[1];
-                        // Debug: log base64 length
-                        console.log('[AI Generate] base64 length:', base64Data.length);
-                        // POST to backend
-                        const resp = await fetch('http://127.0.0.1:5000/analyze-image', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ image_data: base64Data })
-                        });
-                        // Debug: log response status
-                        console.log('[AI Generate] fetch response status:', resp.status);
-                        let respBodyText;
+                        // Debug logs
+                        console.log('[AI Generate] Sent payload size:', base64Data.length);
+                        let resp;
                         try {
-                            respBodyText = await resp.clone().text();
-                            console.log('[AI Generate] fetch response body:', respBodyText);
-                        } catch (e) {
-                            console.log('[AI Generate] Could not read response body');
+                            resp = await fetch('https://city-hawk.onrender.com/analyze-image', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ image_data: base64Data })
+                            });
+                        } catch (err) {
+                            console.error('[AI Generate] Network error:', err);
+                            showNotification('Network error: ' + err.message, 'error');
+                            throw err;
                         }
-                        if (!resp.ok) {
-                            let errorMsg = 'Failed to get AI description';
-                            try {
-                                const errData = JSON.parse(respBodyText);
-                                if (errData && errData.error) errorMsg = errData.error;
-                            } catch {}
-                            showNotification(errorMsg, 'error');
-                            return;
-                        }
+                        console.log('[AI Generate] Response status:', resp.status);
+                        let respText = await resp.text();
+                        console.log('[AI Generate] Raw response text:', respText);
                         let data;
                         try {
-                            data = JSON.parse(respBodyText);
+                            data = JSON.parse(respText);
                         } catch (e) {
-                            data = await resp.json();
+                            console.error('[AI Generate] JSON parse error:', e);
+                            data = null;
+                        }
+                        if (!resp.ok) {
+                            showNotification(data && data.error ? data.error : 'Failed to get AI description', 'error');
+                            return;
                         }
                         if (data && data.description) {
                             issueDescription.value = data.description;
                             showNotification('AI description generated!', 'success');
-                        } else if (data && data.error) {
-                            showNotification('AI error: ' + data.error, 'error');
                         } else {
-                            showNotification('No description returned from AI.', 'error');
+                            showNotification('AI did not return a description.', 'error');
                         }
                     } catch (err) {
                         console.error('[AI Generate] Error:', err);
