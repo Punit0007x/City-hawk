@@ -386,7 +386,7 @@ body {
     otpForm.addEventListener('submit', (e) => {
         e.preventDefault(); // Prevent default form submission
         if ([...otpInputs].every(input => input.value.trim() !== "")) {
-            window.location.href = "dashboard.html";
+            window.location.href = "home.html";
         } else {
             alert("Please enter the complete OTP.");
         }
