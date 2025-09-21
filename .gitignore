@@ -1,0 +1,16 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore macOS junk
+.DS_Store
+
+# Ignore node_modules (if any future JS deps)
+node_modules/
+
+# Ignore local environment file
+.env
+
+# Ignore virtual environment folders
+venv/
+.env.local
