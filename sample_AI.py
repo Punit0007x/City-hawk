@@ -8,52 +8,13 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# --- Robust API Key Loading ---
-GEMINI_API_KEY = None
-print("INFO: Attempting to load API key...")
+# --- API Key Loading ---
+from dotenv import load_dotenv
+load_dotenv()
 
-# Method 1: Standard .env loading (Best Practice)
-try:
-    if os.path.exists('.env'):
-        print("INFO: .env file found. Loading variables.")
-        load_dotenv()
-        GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    else:
-        print("WARNING: .env file not found in the current directory.")
-except Exception as e:
-    print(f"ERROR: An error occurred while loading .env file: {e}")
-
-# Method 2: Manual Fallback (If standard method fails)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    print("INFO: API key not found in environment. Attempting manual fallback...")
-    try:
-        with open('.env', 'r') as f:
-            for line in f:
-                if line.startswith('GEMINI_API_KEY='):
-                    GEMINI_API_KEY = line.strip().split('=', 1)[1]
-                    # Remove quotes if they exist
-                    if GEMINI_API_KEY.startswith('"') and GEMINI_API_KEY.endswith('"'):
-                        GEMINI_API_KEY = GEMINI_API_KEY[1:-1]
-                    print("INFO: Successfully loaded API key using manual fallback.")
-                    break
-    except FileNotFoundError:
-        print("ERROR: Manual fallback failed. .env file does not exist.")
-    except Exception as e:
-        print(f"ERROR: An error occurred during manual fallback: {e}")
-
-# Final Check: If key is still not found, raise an error.
-if not GEMINI_API_KEY:
-    error_message = (
-        "FATAL: GEMINI_API_KEY could not be loaded after all attempts.\n"
-        "Please double-check the following:\n"
-        "1. The file is named EXACTLY '.env' (with the dot).\n"
-        "2. It is in the SAME directory as this script.\n"
-        "3. Its content is EXACTLY: GEMINI_API_KEY=\"YOUR_KEY_HERE\"\n"
-        "4. The file has a blank line at the end."
-    )
-    raise ValueError(error_message)
-
-print("SUCCESS: Gemini API Key loaded successfully.")
+    raise ValueError("GEMINI_API_KEY not found! Please set it in your .env file (for local use) or in Render environment variables.")
 
 # --- Setup Gemini & Other Models ---
 genai.configure(api_key=GEMINI_API_KEY)
@@ -103,4 +64,3 @@ def analyze_image():
 if __name__ == "__main__":
     print("INFO: Starting Flask server...")
     app.run(host="0.0.0.0", port=5000, debug=True)
-
