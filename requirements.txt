@@ -1,0 +1,7 @@
+flask
+flask-cors
+pillow
+transformers
+torch
+google-generativeai
+python-dotenv

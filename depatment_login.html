@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Department Login - Government of India</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #134e4a); /* From Slate-900 to Teal-900 */
+            min-height: 100vh;
+        }
+        .login-card-container {
+            background-color: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 1.25rem; /* slightly larger than the card for the bar */
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-200">
+
+    <main class="flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md">
+            <div class="login-card-container shadow-2xl border border-gray-700 overflow-hidden">
+                <!-- Tri-color Accent Bar -->
+                <div class="h-1.5 w-full bg-gradient-to-r from-orange-500 via-white to-green-600"></div>
+
+                <div class="p-8">
+                    <div class="text-center mb-8">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/120px-Emblem_of_India.svg.png" alt="Emblem of India" class="mx-auto h-20 w-auto mb-4" />
+                        <h1 class="text-3xl font-bold text-white">Government of India</h1>
+                        <p class="text-gray-400 mt-2">Department Login</p>
+                    </div>
+
+                    <form id="loginForm">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
+                                <input type="text" id="username" name="username" required
+                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400"
+                                    placeholder="e.g., admin">
+                            </div>
+                            <div>
+                                <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                                <input type="password" id="password" name="password" required
+                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400"
+                                    placeholder="••••••••">
+                            </div>
+                        </div>
+
+                        <div id="errorMessage" class="hidden mt-6 p-3 bg-red-800 border border-red-600 text-red-200 text-sm rounded-md">
+                            Invalid username or password. Please try again.
+                        </div>
+
+                        <div class="mt-8">
+                            <button type="submit"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus:ring-offset-gray-800 transition-all transform hover:scale-105">
+                                Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <p class="text-center text-xs text-gray-500 mt-6">
+                &copy; 2025 Government of India. For authorized personnel only.
+            </p>
+        </div>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent actual form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // --- Mock Authentication ---
+            // In a real application, this would be an API call.
+            if (username === 'admin' && password === 'password123') {
+                errorMessage.classList.add('hidden');
+                
+                // On successful login, redirect to the dashboard.
+                // Make sure the filename matches your department dashboard file.
+                window.location.href = 'department_dashboard.html';
+
+            } else {
+                // Show an error message
+                errorMessage.classList.remove('hidden');
+            }
+        });
+    });
+    </script>
+</body>
+</html>
+
