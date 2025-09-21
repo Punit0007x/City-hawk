@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Hub - City Hawk</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+    .action-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .action-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    @keyframes bg-gradient-flow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animated-gradient {
+        background: linear-gradient(-45deg, #10B981, #3B82F6, #8B5CF6, #EC4899);
+        background-size: 400% 400%;
+        animation: bg-gradient-flow 15s ease infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 antialiased">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-xl font-bold">City Hawk</h1>
+      <div class="flex items-center space-x-2 sm:space-x-4">
+        <!-- Language Selector -->
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m-9 9h18" />
+            </svg>
+            <select id="languageSelect" class="bg-white/20 text-white rounded-md px-2 py-1 text-sm border-white/30 focus:ring-2 focus:ring-white">
+              <option value="en" class="text-black">English</option>
+              <option value="hi" class="text-black">हिंदी</option>
+              <option value="kn" class="text-black">ಕನ್ನಡ</option>
+              <option value="ta" class="text-black">தமிழ்</option>
+              <option value="te" class="text-black">తెలుగు</option>
+              <option value="ml" class="text-black">മലയാളം</option>
+              <option value="bn" class="text-black">বাংলা</option>
+            </select>
+        </div>
+        <!-- Profile/Logout for larger screens -->
+        <div class="hidden sm:flex items-center space-x-2">
+            <button class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-md shadow-sm text-sm font-semibold">Profile</button>
+            <button class="bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-md shadow-sm text-sm font-semibold">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <div class="animated-gradient text-white">
+        <div class="max-w-6xl mx-auto px-6 py-20 lg:py-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 id="hero-headline" class="text-4xl md:text-5xl font-extrabold leading-tight">Be the Change in Your City.</h2>
+                <p id="hero-subheadline" class="mt-4 text-lg text-indigo-200">Your voice matters. Report civic issues, track their resolution, and help build a better, more responsive community with City Hawk.</p>
+            </div>
+            <div>
+                <img src="cityhawk-hero.jpg" 
+                     alt="Citizens collaborating to improve their city" 
+                     class="rounded-2xl shadow-2xl w-full h-48 sm:h-64 md:h-80 lg:h-auto object-cover object-center">
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Cards Section -->
+    <div class="max-w-4xl mx-auto p-6 sm:p-10 -mt-16 relative z-10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+        <!-- Report Issue -->
+        <a href="dashboard.html" class="action-card block p-8 bg-white rounded-2xl shadow-xl text-center">
+          <div class="text-5xl mb-4">📝</div>
+          <h3 id="report-title" class="text-xl font-semibold text-purple-600 mb-2">Report an Issue</h3>
+          <p id="report-desc" class="text-gray-600 text-sm">Submit a new civic issue with details and photos directly from your location.</p>
+        </a>
+
+        <!-- See Reported Issues -->
+        <a href="my_reports.html" class="action-card block p-8 bg-white rounded-2xl shadow-xl text-center">
+          <div class="text-5xl mb-4">📋</div>
+          <h3 id="view-title" class="text-xl font-semibold text-purple-600 mb-2">See My Reports</h3>
+          <p id="view-desc" class="text-gray-600 text-sm">Track the status of all your submitted reports and view their resolution history.</p>
+        </a>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Footer for mobile logout -->
+  <footer class="fixed sm:hidden bottom-0 left-0 w-full bg-white/80 backdrop-blur-sm p-2 border-t border-gray-200">
+      <div class="grid grid-cols-2 gap-2">
+          <button class="bg-gray-200 text-gray-800 px-3 py-2 rounded-md shadow-sm hover:bg-gray-300 text-sm font-semibold">Profile</button>
+          <button class="bg-red-500 text-white px-3 py-2 rounded-md shadow-sm hover:bg-red-600 text-sm font-semibold">Logout</button>
+      </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const translations = {
+            en: { headline: 'Be the Change in Your City.', subheadline: 'Your voice matters. Report civic issues, track their resolution, and help build a better, more responsive community with City Hawk.', reportTitle: 'Report an Issue', reportDesc: 'Submit a new civic issue with details and photos directly from your location.', viewTitle: 'See My Reports', viewDesc: 'Track the status of all your submitted reports and view their resolution history.' },
+            hi: { headline: 'अपने शहर में बदलाव बनें।', subheadline: 'आपकी आवाज़ मायने रखती है। नागरिक मुद्दों की रिपोर्ट करें, उनके समाधान को ट्रैक करें, और सिटी हॉक के साथ एक बेहतर, अधिक उत्तरदायी समुदाय बनाने में मदद करें।', reportTitle: 'समस्या की रिपोर्ट करें', reportDesc: 'अपने स्थान से सीधे विवरण और तस्वीरों के साथ एक नया नागरिक मुद्दा प्रस्तुत करें।', viewTitle: 'मेरी रिपोर्ट देखें', viewDesc: 'अपनी सभी प्रस्तुत रिपोर्टों की स्थिति को ट्रैक करें और उनका समाधान इतिहास देखें।' },
+            kn: { headline: 'ನಿಮ್ಮ ನಗರದಲ್ಲಿ ಬದಲಾವಣೆಯಾಗಿರಿ.', subheadline: 'ನಿಮ್ಮ ಧ್ವನಿ ಮುಖ್ಯವಾಗಿದೆ. ನಾಗರಿಕ ಸಮಸ್ಯೆಗಳನ್ನು ವರದಿ ಮಾಡಿ, ಅವುಗಳ ಪರಿಹಾರವನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ, ಮತ್ತು ಸಿಟಿ ಹಾಕ್‌ನೊಂದಿಗೆ ಉತ್ತಮ, ಹೆಚ್ಚು ಸ್ಪಂದಿಸುವ ಸಮುದಾಯವನ್ನು ನಿರ್ಮಿಸಲು ಸಹಾಯ ಮಾಡಿ.', reportTitle: 'ಸಮಸ್ಯೆಯನ್ನು ವರದಿ ಮಾಡಿ', reportDesc: 'ನಿಮ್ಮ ಸ್ಥಳದಿಂದ ನೇರವಾಗಿ ವಿವರಗಳು ಮತ್ತು ಫೋಟೋಗಳೊಂದಿಗೆ ಹೊಸ ನಾಗರಿಕ ಸಮಸ್ಯೆಯನ್ನು ಸಲ್ಲಿಸಿ.', viewTitle: 'ನನ್ನ ವರದಿಗಳನ್ನು ನೋಡಿ', viewDesc: 'ನಿಮ್ಮ ಸಲ್ಲಿಸಿದ ಎಲ್ಲಾ ವರದಿಗಳ ಸ್ಥಿತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ ಮತ್ತು ಅವುಗಳ ಪರಿಹಾರ ಇತಿಹಾಸವನ್ನು ವೀಕ್ಷಿಸಿ.' },
+            ta: { headline: 'உங்கள் நகரத்தில் மாற்றமாக இருங்கள்.', subheadline: 'உங்கள் குரல் முக்கியமானது. नागरिकப் பிரச்சினைகளைப் புகாரளிக்கவும், அவற்றின் தீர்வைக் கண்காணிக்கவும், மேலும் சிட்டி ஹாக் மூலம் சிறந்த, அதிக பதிலளிக்கக்கூடிய சமூகத்தை உருவாக்க உதவுங்கள்.', reportTitle: 'ஒரு சிக்கலைப் புகாரளி', reportDesc: 'உங்கள் இருப்பிடத்திலிருந்து நேரடியாக விவரங்கள் மற்றும் புகைப்படங்களுடன் ஒரு புதிய नागरिकப் பிரச்சினையைச் சமர்ப்பிக்கவும்.', viewTitle: 'எனது அறிக்கைகளைக் காண்க', viewDesc: 'நீங்கள் சமர்ப்பித்த அனைத்து அறிக்கைகளின் நிலையைக் கண்காணித்து, அவற்றின் தீர்வு வரலாற்றைக் காண்க.' },
+            te: { headline: 'మీ నగరంలో మార్పు మీరే అవ్వండి.', subheadline: 'మీ గొంతు ముఖ్యం. పౌర సమస్యలను నివేదించండి, వాటి పరిష్కారాన్ని ట్రాక్ చేయండి మరియు సిటీ హాక్‌తో మెరుగైన, మరింత ప్రతిస్పందించే సమాజాన్ని నిర్మించడంలో సహాయపడండి.', reportTitle: 'సమస్యను నివేదించండి', reportDesc: 'మీ స్థానం నుండి నేరుగా వివరాలు మరియు ఫోటోలతో కొత్త పౌర సమస్యను సమర్పించండి.', viewTitle: 'నా నివేదికలను చూడండి', viewDesc: 'మీరు సమర్పించిన అన్ని నివేదికల స్థితిని ట్రాక్ చేయండి మరియు వాటి పరిష్కార చరిత్రను వీక్షించండి.' },
+            ml: { headline: 'നിങ്ങളുടെ നഗരത്തിലെ മാറ്റം നിങ്ങളാകുക.', subheadline: 'നിങ്ങളുടെ ശബ്ദം പ്രധാനമാണ്. നഗരത്തിലെ പ്രശ്നങ്ങൾ റിപ്പോർട്ട് ചെയ്യുക, അവയുടെ പരിഹാരം ട്രാക്ക് ചെയ്യുക, സിറ്റി ഹോക്കിനൊപ്പം മികച്ചതും കൂടുതൽ പ്രതികരിക്കുന്നതുമായ ഒരു സമൂഹം കെട്ടിപ്പടുക്കാൻ സഹായിക്കുക.', reportTitle: 'ഒരു പ്രശ്നം റിപ്പോർട്ട് ചെയ്യുക', reportDesc: 'നിങ്ങളുടെ ലൊക്കേഷനിൽ നിന്ന് നേരിട്ട് വിശദാംശങ്ങളും ഫോട്ടോകളും സഹിതം ഒരു പുതിയ നാഗരിക പ്രശ്നം സമർപ്പിക്കുക.', viewTitle: 'എൻ്റെ റിപ്പോർട്ടുകൾ കാണുക', viewDesc: 'നിങ്ങൾ സമർപ്പിച്ച എല്ലാ റിപ്പോർട്ടുകളുടെയും നില ട്രാക്ക് ചെയ്യുകയും അവയുടെ പരിഹാര ചരിത്രം കാണുകയും ചെയ്യുക.' },
+            bn: { headline: 'আপনার শহরে পরিবর্তন আনুন।', subheadline: 'আপনার কণ্ঠস্বর গুরুত্বপূর্ণ। নাগরিক সমস্যাগুলি রিপোর্ট করুন, তাদের সমাধান ট্র্যাক করুন এবং সিটি হকের সাথে একটি উন্নত, আরও প্রতিক্রিয়াশীল সম্প্রদায় গঠনে সহায়তা করুন।', reportTitle: 'একটি সমস্যা রিপোর্ট করুন', reportDesc: 'আপনার অবস্থান থেকে সরাসরি বিবরণ এবং ফটো সহ একটি নতুন নাগরিক সমস্যা জমা দিন।', viewTitle: 'আমার রিপোর্ট দেখুন', viewDesc: 'আপনার জমা দেওয়া সমস্ত রিপোর্টের অবস্থা ট্র্যাক করুন এবং তাদের সমাধানের ইতিহাস দেখুন।' }
+        };
+
+        const languageSelect = document.getElementById('languageSelect');
+        const elementsToTranslate = {
+            headline: document.getElementById('hero-headline'),
+            subheadline: document.getElementById('hero-subheadline'),
+            reportTitle: document.getElementById('report-title'),
+            reportDesc: document.getElementById('report-desc'),
+            viewTitle: document.getElementById('view-title'),
+            viewDesc: document.getElementById('view-desc')
+        };
+
+        function applyLanguage(lang) {
+            const content = translations[lang];
+            if (content) {
+                for (const key in elementsToTranslate) {
+                    if (elementsToTranslate[key]) {
+                        elementsToTranslate[key].textContent = content[key];
+                    }
+                }
+                languageSelect.value = lang;
+            }
+        }
+        
+        // On page load, check for a saved language
+        const savedLang = localStorage.getItem('selectedLanguage');
+        if (savedLang) {
+            applyLanguage(savedLang);
+        }
+
+        // When the user changes the language, apply it and save the choice
+        languageSelect.addEventListener('change', (event) => {
+            const lang = event.target.value;
+            localStorage.setItem('selectedLanguage', lang);
+            applyLanguage(lang);
+        });
+    });
+  </script>
+
+</body>
+</html>
+
