@@ -344,7 +344,7 @@
                     </div>
                     <div id="modal-photo-upload-${report.trackingId}" class="${report.status === 'resolved' ? '' : 'hidden'}">
                          <label for="modal-photo-${report.trackingId}" class="block text-sm font-medium mb-1">Upload Solved Photo:</label>
-                         <input type="file" id="modal-photo-${report.trackingId}" onchange="uploadSolvedPhoto('${report.trackingId}', this)" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 hover:file:bg-gray-200"/>
+                         <input type="file" id="modal-photo-${report.trackingId}" onchange="uploadSolvedPhoto('${report.trackingId}', this)" accept="image/*" capture="environment" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 hover:file:bg-gray-200"/>
                     </div>
                 </div>
               </div>
