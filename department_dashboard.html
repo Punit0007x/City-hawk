@@ -7,17 +7,101 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet CSS & JS for Map Integration -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(45deg, #ff6ec4, #7873f5, #42e695, #fddb92);
+      background-size: 800% 800%;
+      animation: gradientBackground 25s ease infinite;
+      color: #1f2937;
+    }
+
+    @keyframes gradientBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .gradient-text { background-image: linear-gradient(to right, #4f46e5, #a259ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .view-hidden { display: none; }
-    .department-card { transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; }
-    .department-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+    /* Enhanced department-card styles */
+    .department-card {
+      background: linear-gradient(135deg, #ffffff, #f9fafb);
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+    .department-card:hover {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: white;
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    }
     #analyticsView { animation: fadeIn 0.5s ease-in-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .status-btn.active { font-weight: 700; }
+    /* Status button active state with animated gradient */
+    .status-btn.active {
+      background: linear-gradient(90deg, #ec4899, #f97316, #facc15);
+      color: white !important;
+      font-weight: bold;
+      animation: gradientFlow 4s linear infinite;
+      background-size: 300% 300%;
+      box-shadow: 0 0 10px rgba(236,72,153,0.6);
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .report-list-item.active { border-left-width: 4px; }
+    /* Fancy action button styles */
+    .fancy-btn {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 0 10px rgba(59,130,246,0.6);
+      transition: all 0.3s ease;
+    }
+    .fancy-btn:hover {
+      box-shadow: 0 0 20px rgba(59,130,246,0.9);
+      transform: scale(1.05);
+    }
+    /* Optionally, custom status button style for extra polish */
+    .fancy-status {
+      border: none;
+      outline: none;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    /* Description box for improved readability */
+    .description-box {
+      font-size: 1rem;
+      line-height: 1.6;
+      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: #1f2937; /* dark gray text */
+    }
+    /* Animated Icons & Micro-Interactions */
+    .department-card i, .status-btn i {
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .department-card:hover i, .status-btn:hover i {
+      transform: scale(1.2) rotate(10deg);
+      color: #ffffff;
+    }
+    /* Badge Styles */
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -32,7 +116,6 @@
 
   <!-- View 1: Department Selection -->
   <div id="departmentsListView">
-    <h2 class="text-3xl font-bold text-gray-900 mb-6">Select a Department to Analyze</h2>
     <div id="departmentsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Department cards will be dynamically inserted here -->
     </div>
@@ -46,6 +129,7 @@
       <div class="flex items-center gap-4">
         <i id="analyticsIcon" class="fa-solid fa-2x"></i>
         <h2 id="analyticsTitle" class="text-4xl font-bold"></h2>
+        <button class="fancy-btn ml-4" onclick="exportAnalyticsCSV()">Export Analytics CSV</button>
       </div>
     </div>
 
@@ -167,6 +251,8 @@
             status: r.status || 'submitted',
             photos: Array.isArray(r.photos) ? r.photos : [],
             solvedPhoto: r.solvedPhoto || null,
+            history: r.history || [],
+            comments: r.comments || [],
         };
     }
     
@@ -236,6 +322,18 @@
         // Keep existing p-4 rounded-xl, but set bgColor from info.bgColor
         document.getElementById('analyticsView').className = `${info.bgColor} p-4 rounded-xl`;
 
+        // Dynamic background gradients per department
+        const analyticsView = document.getElementById('analyticsView');
+        const bgGradients = {
+          "Pothole": "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+          "Waste Management": "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+          "Broken Streetlight": "linear-gradient(135deg, #fbc2eb, #a6c1ee)",
+          "Water Leakage": "linear-gradient(135deg, #89f7fe, #66a6ff)",
+          "Park Maintenance": "linear-gradient(135deg, #d4fc79, #96e6a1)",
+          "Traffic Signal Issue": "linear-gradient(135deg, #f6d365, #fda085)"
+        };
+        analyticsView.style.background = bgGradients[category] || "";
+
         // 2. Render Status Filters
         renderStatusFilters();
         
@@ -252,7 +350,7 @@
         Object.keys(statusConfig).forEach(status => {
             const info = statusConfig[status];
             const btn = `
-                <button class="status-btn w-full text-left flex items-center justify-between p-2 rounded-lg transition-colors hover:bg-gray-100 ${status === activeStatusFilter ? `${info.lightColor} ${info.color} active` : ''}" data-status="${status}" onclick="setFilter('${status}')">
+                <button class="status-btn fancy-status w-full text-left flex items-center justify-between p-2 rounded-lg transition-colors hover:bg-gray-100 ${status === activeStatusFilter ? `${info.lightColor} ${info.color} active` : ''}" data-status="${status}" onclick="setFilter('${status}')">
                     <span class="flex items-center gap-3">
                         <i class="fa-solid ${info.icon}"></i>
                         ${info.text}
@@ -289,10 +387,19 @@
 
         filteredReports.forEach(r => {
             const deptInfo = departmentInfo[r.issueCategory];
+            // Status badge with color
+            const statusBadge = `<span class="status-badge px-2 py-0.5 rounded-full text-xs font-semibold ${
+                r.status === 'submitted' ? 'bg-yellow-200 text-yellow-800'
+                : r.status === 'inprogress' ? 'bg-blue-200 text-blue-800'
+                : 'bg-green-200 text-green-800'
+            }">${r.status}</span>`;
             const item = `
-                <div class="report-list-item p-3 rounded-lg cursor-pointer hover:bg-gray-50 ${activeReportId === r.trackingId ? `${deptInfo.lightColor} ${deptInfo.borderColor}` : 'border-l-4 border-transparent'}" onclick="renderReportDetail('${r.trackingId}')">
+                <div class="report-list-item p-3 rounded-lg cursor-pointer hover:bg-gray-50 border-l-4 ${activeReportId === r.trackingId ? 'border-blue-500' : 'border-transparent'}" onclick="renderReportDetail('${r.trackingId}')">
+                  <div class="flex justify-between items-center">
                     <p class="font-semibold text-sm line-clamp-1">${r.issueDescription}</p>
-                    <p class="text-xs text-gray-500 font-mono">${r.trackingId}</p>
+                    ${statusBadge}
+                  </div>
+                  <p class="text-xs text-gray-500 font-mono">${r.trackingId}</p>
                 </div>`;
             container.innerHTML += item;
         });
@@ -317,12 +424,14 @@
             <div class="space-y-5">
                 <div>
                   <label class="text-xs font-semibold text-gray-500 uppercase">Description</label>
-                  <p class="text-gray-800 text-lg bg-gray-50 p-3 mt-1 rounded-lg border">${report.issueDescription}</p>
+                  <div class="description-box">${report.issueDescription}</div>
                 </div>
-                
+                <!-- Map Integration -->
+                <div id="reportMap" class="w-full h-64 rounded-lg mt-4"></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm border-t pt-4">
                   <p><strong><i class="fa-solid fa-hashtag w-5"></i> Tracking ID:</strong> <span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded">${report.trackingId}</span></p>
                   <p><strong><i class="fa-solid fa-calendar-days w-5"></i> Submitted:</strong> ${new Date(report.timestamp).toLocaleString()}</p>
+                  <p><strong><i class="fa-solid fa-location-dot w-5"></i> Coordinates:</strong> Lat: ${report.latitude.toFixed(6)}, Lng: ${report.longitude.toFixed(6)}</p>
                 </div>
 
                 <div>
@@ -332,11 +441,29 @@
                 
                 ${solvedImage}
 
+                <!-- History Section -->
+                <div class="mt-4">
+                    <h4 class="font-semibold text-md text-gray-700 mb-2">History</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        ${report.history && report.history.length > 0 ? report.history.map(h => `<li>${new Date(h.timestamp).toLocaleString()}: ${h.status}</li>`).join('') : '<li>No history available.</li>'}
+                    </ul>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="mt-4">
+                    <h4 class="font-semibold text-md text-gray-700 mb-2">Comments</h4>
+                    <ul id="commentsList" class="list-disc pl-5 text-sm text-gray-600">
+                        ${report.comments ? report.comments.map(c => `<li>${new Date(c.timestamp).toLocaleString()}: ${c.text}</li>`).join('') : ''}
+                    </ul>
+                    <textarea id="newComment" class="w-full border rounded p-2 mt-2" placeholder="Add a comment"></textarea>
+                    <button class="fancy-btn mt-2" onclick="addComment('${report.trackingId}')">Add Comment</button>
+                </div>
+
                 <div class="border-t pt-4 mt-6 space-y-4">
                     <h4 class="font-semibold text-md text-gray-800">Manage Report</h4>
                     <div class="flex items-center gap-4">
                         <label for="modal-status-${report.trackingId}" class="text-sm font-medium">Update Status:</label>
-                        <select id="modal-status-${report.trackingId}" onchange="updateStatus('${report.trackingId}', this.value)" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 ${deptInfo.borderColor}">
+                        <select id="modal-status-${report.trackingId}" onchange="updateStatus('${report.trackingId}', this.value)" class="fancy-btn w-full border border-gray-300 rounded-lg p-2 focus:ring-2 ${deptInfo.borderColor}">
                             <option value="submitted" ${report.status === 'submitted' ? 'selected' : ''}>Pending</option>
                             <option value="inprogress" ${report.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
                             <option value="resolved" ${report.status === 'resolved' ? 'selected' : ''}>Solved</option>
@@ -344,17 +471,24 @@
                     </div>
                     <div id="modal-photo-upload-${report.trackingId}" class="${report.status === 'resolved' ? '' : 'hidden'}">
                          <label for="modal-photo-${report.trackingId}" class="block text-sm font-medium mb-1">Upload Solved Photo:</label>
-                         <input type="file" id="modal-photo-${report.trackingId}" onchange="uploadSolvedPhoto('${report.trackingId}', this)" accept="image/*" capture="environment" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 hover:file:bg-gray-200"/>
+                         <input type="file" id="modal-photo-${report.trackingId}" onchange="uploadSolvedPhoto('${report.trackingId}', this)" accept="image/*" capture="environment" class="fancy-btn w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 hover:file:bg-gray-200"/>
                     </div>
                 </div>
               </div>
         `;
+        // Render map after HTML update
+        setTimeout(() => renderMapForReport(report), 0);
     }
 
     function updateStatus(reportId, newStatus) {
         let reports = getAllReports();
         const reportIndex = reports.findIndex(r => r.trackingId === reportId);
         if (reportIndex !== -1) {
+            // Add to history
+            if (!Array.isArray(reports[reportIndex].history)) {
+                reports[reportIndex].history = [];
+            }
+            reports[reportIndex].history.push({ status: newStatus, timestamp: Date.now() });
             reports[reportIndex].status = newStatus;
             localStorage.setItem('reports', JSON.stringify(reports));
             // Refresh data and UI
@@ -387,8 +521,11 @@
     document.getElementById('backToHubBtn').addEventListener('click', showDepartmentsList);
     document.addEventListener("DOMContentLoaded", renderDepartmentHub);
 
+
 </script>
 
 </body>
 </html>
 
+
+   
