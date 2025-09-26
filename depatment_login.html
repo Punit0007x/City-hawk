@@ -1,106 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Department Login - Government of India</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1e3a8a, #9333ea, #f59e0b); /* Blue, Purple, Gold */
-            min-height: 100vh;
-        }
-        .login-card-container {
-            background-color: rgba(31, 41, 55, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 1.25rem; /* slightly larger than the card for the bar */
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Department Analytics Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Leaflet CSS & JS for Map Integration -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #1f2937;
+    }
+    .gradient-text { background-image: linear-gradient(to right, #4f46e5, #a259ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .view-hidden { display: none; }
+    /* Enhanced department-card styles */
+    .department-card {
+      background: linear-gradient(135deg, #ffffff, #f9fafb);
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+    .department-card:hover {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: white;
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    }
+    #analyticsView { animation: fadeIn 0.5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* Status button active state with animated gradient */
+    .status-btn.active {
+      background: linear-gradient(90deg, #ec4899, #f97316, #facc15);
+      color: white !important;
+      font-weight: bold;
+      animation: gradientFlow 4s linear infinite;
+      background-size: 300% 300%;
+      box-shadow: 0 0 10px rgba(236,72,153,0.6);
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .report-list-item.active { border-left-width: 4px; }
+    /* Fancy action button styles */
+    .fancy-btn {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: white;
+      font-weight: 600;
+      border-radius: 0.75rem;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 0 10px rgba(59,130,246,0.6);
+      transition: all 0.3s ease;
+    }
+    .fancy-btn:hover {
+      box-shadow: 0 0 20px rgba(59,130,246,0.9);
+      transform: scale(1.05);
+    }
+    /* Optionally, custom status button style for extra polish */
+    .fancy-status {
+      border: none;
+      outline: none;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    /* Description box for improved readability */
+    .description-box {
+      font-size: 1rem;
+      line-height: 1.6;
+      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: #1f2937; /* dark gray text */
+    }
+    /* Animated Icons & Micro-Interactions */
+    .department-card i, .status-btn i {
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .department-card:hover i, .status-btn:hover i {
+      transform: scale(1.2) rotate(10deg);
+      color: #ffffff;
+    }
+    /* Badge Styles */
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+  </style>
 </head>
-<body class="antialiased text-gray-200">
+<body class="antialiased text-gray-800">
 
-    <main class="flex items-center justify-center min-h-screen p-4">
-        <div class="w-full max-w-md">
-            <div class="login-card-container shadow-2xl border border-gray-700 overflow-hidden">
-                <!-- Tri-color Accent Bar -->
-                <div class="h-1.5 w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600"></div>
+<header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold gradient-text">Department Hub</h1>
+    <button onclick="logout()" class="fancy-btn text-sm">Logout</button>
+  </div>
+</header>
 
-                <div class="p-8">
-                    <div class="text-center mb-8">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/120px-Emblem_of_India.svg.png" alt="Emblem of India" class="mx-auto h-20 w-auto mb-4 filter invert brightness-0" />
-                        <h1 class="text-3xl font-bold text-white">City Hawk Department Portal</h1>
-                        <p class="text-gray-400 mt-2">Department Login</p>
-                    </div>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-                    <form id="loginForm">
-                        <div class="space-y-6">
-                            <div>
-                                <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
-                                <input type="text" id="username" name="username" required
-                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400"
-                                    placeholder="e.g., admin">
-                            </div>
-                            <div>
-                                <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                                <input type="password" id="password" name="password" required
-                                    class="mt-1 block w-full bg-gray-900 border border-gray-600 rounded-md shadow-sm py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400"
-                                    placeholder="••••••••">
-                            </div>
-                        </div>
+  <!-- View 1: Department Selection -->
+  <div id="departmentsListView">
+    <div id="departmentsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Department cards will be dynamically inserted here -->
+    </div>
+  </div>
 
-                        <div id="errorMessage" class="hidden mt-6 p-3 bg-red-800 border border-red-600 text-red-200 text-sm rounded-md">
-                            Invalid username or password. Please try again.
-                        </div>
+  <!-- View 2: Department Analytics Dashboard -->
+  <div id="analyticsView" class="view-hidden">
+    <!-- Header -->
+    <div id="analyticsHeader" class="mb-8 p-6 rounded-2xl text-white shadow-lg">
+      <button id="backToHubBtn" class="mb-4 text-sm font-semibold opacity-80 hover:opacity-100 transition"><i class="fa-solid fa-arrow-left mr-2"></i>Back to Department Hub</button>
+      <div class="flex items-center gap-4">
+        <i id="analyticsIcon" class="fa-solid fa-2x"></i>
+        <h2 id="analyticsTitle" class="text-4xl font-bold"></h2>
+        <button class="fancy-btn ml-4" onclick="exportAnalyticsCSV()">Export Analytics CSV</button>
+      </div>
+    </div>
 
-                        <div class="mt-8">
-                            <button type="submit"
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 focus:ring-offset-gray-800 transition-all transform hover:scale-105">
-                                Login
-                            </button>
-                        </div>
-                    </form>
+    <!-- New Two-Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left Sidebar for filtering -->
+        <div class="lg:col-span-4 xl:col-span-3">
+            <div class="bg-white p-4 rounded-xl shadow sticky top-24">
+                <h3 class="font-bold text-lg mb-4 px-2">Report Status</h3>
+                <nav id="statusNav" class="space-y-1">
+                    <!-- Status buttons will be inserted here -->
+                </nav>
+                <div id="reportListContainer" class="mt-4 pt-4 border-t h-96 overflow-y-auto">
+                   <!-- List of reports based on filter will appear here -->
                 </div>
             </div>
-            <p class="text-center text-xs text-gray-500 mt-6">
-                &copy; 2025 Government of India. For authorized personnel only.
-            </p>
         </div>
-    </main>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
+        <!-- Right Content Area for details -->
+        <div id="reportDetailWrapper" class="lg:col-span-8 xl:col-span-9">
+            <div id="reportDetailView" class="bg-white p-6 rounded-xl shadow">
+                <!-- Selected report details will appear here -->
+                <div class="text-center text-gray-500 py-24">
+                    <i class="fa-solid fa-arrow-left text-3xl mb-4"></i>
+                    <p class="font-semibold">Select a report from the left to view its details.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</main>
 
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent actual form submission
+<script>
+    // --- CONFIG & GLOBAL VARS --- //
+    let currentAnalyticsCategory = null;
+    let currentReportList = [];
+    let activeStatusFilter = 'all';
+    let activeReportId = null;
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    const departmentInfo = {
+        "Pothole": {
+            name: "Roads & Transport",
+            icon: "fa-road",
+            color: "bg-gradient-to-r from-red-500 to-pink-500",
+            lightColor: "from-red-100 to-pink-100 bg-gradient-to-r",
+            textColor: "text-red-800",
+            borderColor: "border-red-500",
+            hex: '#EF4444',
+            bgColor: "bg-red-50"
+        },
+        "Waste Management": {
+            name: "Sanitation",
+            icon: "fa-dumpster",
+            color: "bg-gradient-to-r from-green-500 to-emerald-500",
+            lightColor: "from-green-100 to-emerald-100 bg-gradient-to-r",
+            textColor: "text-green-800",
+            borderColor: "border-green-500",
+            hex: '#22C55E',
+            bgColor: "bg-green-50"
+        },
+        "Broken Streetlight": {
+            name: "Electricity",
+            icon: "fa-lightbulb",
+            color: "bg-gradient-to-r from-yellow-400 to-orange-500",
+            lightColor: "from-yellow-100 to-orange-100 bg-gradient-to-r",
+            textColor: "text-yellow-800",
+            borderColor: "border-yellow-500",
+            hex: '#EAB308',
+            bgColor: "bg-yellow-50"
+        },
+        "Water Leakage": {
+            name: "Water Supply",
+            icon: "fa-faucet",
+            color: "bg-gradient-to-r from-blue-500 to-cyan-500",
+            lightColor: "from-blue-100 to-cyan-100 bg-gradient-to-r",
+            textColor: "text-blue-800",
+            borderColor: "border-blue-500",
+            hex: '#3B82F6',
+            bgColor: "bg-blue-50"
+        },
+        "Park Maintenance": {
+            name: "Parks & Recreation",
+            icon: "fa-tree",
+            color: "bg-gradient-to-r from-emerald-500 to-teal-500",
+            lightColor: "from-emerald-100 to-teal-100 bg-gradient-to-r",
+            textColor: "text-emerald-800",
+            borderColor: "border-emerald-500",
+            hex: '#10B981',
+            bgColor: "bg-emerald-50"
+        },
+        "Traffic Signal Issue": {
+            name: "Traffic Management",
+            icon: "fa-traffic-light",
+            color: "bg-gradient-to-r from-purple-500 to-pink-600",
+            lightColor: "from-purple-100 to-pink-100 bg-gradient-to-r",
+            textColor: "text-purple-800",
+            borderColor: "border-purple-500",
+            hex: '#A855F7',
+            bgColor: "bg-purple-50"
+        },
+    };
 
-            // --- Mock Authentication ---
-            // In a real application, this would be an API call.
-            if (username === 'admin' && password === 'password123') {
-                errorMessage.classList.add('hidden');
-                
-                // On successful login, redirect to the dashboard.
-                // Make sure the filename matches your department dashboard file.
-                window.location.href = 'department_dashboard.html';
+    const statusConfig = {
+        all: { text: 'All Reports', icon: 'fa-inbox', color: 'text-gray-700', lightColor: 'bg-gray-100' },
+        submitted: { text: 'Pending', icon: 'fa-clock', color: 'text-yellow-700', lightColor: 'bg-yellow-100' },
+        inprogress: { text: 'In Progress', icon: 'fa-person-digging', color: 'text-blue-700', lightColor: 'bg-blue-100' },
+        resolved: { text: 'Resolved', icon: 'fa-circle-check', color: 'text-green-700', lightColor: 'bg-green-100' }
+    };
 
-            } else {
-                // Show an error message
-                errorMessage.classList.remove('hidden');
-            }
+    // --- DATA HANDLING --- //
+    function normalizeReport(r) {
+        return {
+            trackingId: r.trackingId || `TID-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+            issueCategory: r.issueCategory || 'General',
+            issueDescription: r.issueDescription || '',
+            latitude: parseFloat(r.latitude) || 0,
+            longitude: parseFloat(r.longitude) || 0,
+            timestamp: r.timestamp || Date.now(),
+            status: r.status || 'submitted',
+            photos: Array.isArray(r.photos) ? r.photos : [],
+            solvedPhoto: r.solvedPhoto || null,
+            history: r.history || [],
+            comments: r.comments || [],
+        };
+    }
+    
+    function getAllReports() {
+        return (JSON.parse(localStorage.getItem('reports')) || []).map(normalizeReport);
+    }
+
+    // --- VIEW SWITCHING LOGIC --- //
+    const departmentsListView = document.getElementById('departmentsListView');
+    const analyticsView = document.getElementById('analyticsView');
+
+    function showAnalyticsView(category) {
+        currentAnalyticsCategory = category;
+        departmentsListView.classList.add('view-hidden');
+        analyticsView.classList.remove('view-hidden');
+        document.body.scrollTop = 0; document.documentElement.scrollTop = 0;
+        renderAnalyticsFor(category);
+    }
+
+    function showDepartmentsList() {
+        currentAnalyticsCategory = null;
+        analyticsView.classList.add('view-hidden');
+        departmentsListView.classList.remove('view-hidden');
+    }
+
+    // --- MAIN RENDER FUNCTIONS --- //
+    function renderDepartmentHub() {
+        const container = document.getElementById("departmentsContainer");
+        container.innerHTML = "";
+        const allReports = getAllReports();
+
+        Object.entries(departmentInfo).forEach(([category, info]) => {
+            const deptReports = allReports.filter(r => r.issueCategory === category);
+            const pendingCount = deptReports.filter(r => r.status === 'submitted').length;
+            const cardHTML = `
+                <div class="department-card bg-white rounded-xl shadow p-6 cursor-pointer" onclick="showAnalyticsView('${category}')">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid ${info.icon} ${info.lightColor} ${info.textColor} p-3 text-lg rounded-full"></i>
+                                <h3 class="text-xl font-bold text-gray-900">${info.name}</h3>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">${info.name} Department</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                    </div>
+                    <div class="mt-4 pt-4 border-t flex justify-between text-sm">
+                        <span>Total Reports: <span class="font-bold">${deptReports.length}</span></span>
+                        <span>Pending: <span class="font-bold text-yellow-600">${pendingCount}</span></span>
+                    </div>
+                </div>`;
+            container.innerHTML += cardHTML;
         });
-    });
-    </script>
+    }
+
+    function renderAnalyticsFor(category) {
+        currentReportList = getAllReports().filter(r => r.issueCategory === category);
+        const info = departmentInfo[category];
+
+        // 1. Update Header
+        // For gradient backgrounds, ensure text is white for contrast
+        document.getElementById('analyticsHeader').className = `mb-8 p-6 rounded-2xl text-white shadow-lg ${info.color}`;
+        document.getElementById('analyticsIcon').className = `fa-solid ${info.icon} fa-2x`;
+        document.getElementById('analyticsTitle').textContent = `${info.name} Analytics`;
+
+        // 1.5. Update analyticsView background color
+        // Keep existing p-4 rounded-xl, but set bgColor from info.bgColor
+        document.getElementById('analyticsView').className = `${info.bgColor} p-4 rounded-xl`;
+
+        // Dynamic background gradients per department
+        const analyticsView = document.getElementById('analyticsView');
+        const bgGradients = {
+          "Pothole": "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+          "Waste Management": "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+          "Broken Streetlight": "linear-gradient(135deg, #fbc2eb, #a6c1ee)",
+          "Water Leakage": "linear-gradient(135deg, #89f7fe, #66a6ff)",
+          "Park Maintenance": "linear-gradient(135deg, #d4fc79, #96e6a1)",
+          "Traffic Signal Issue": "linear-gradient(135deg, #f6d365, #fda085)"
+        };
+        analyticsView.style.background = bgGradients[category] || "";
+
+        // 2. Render Status Filters
+        renderStatusFilters();
+        
+        // 3. Render filtered list (default to 'all')
+        setFilter('all');
+    }
+
+    function renderStatusFilters() {
+        const nav = document.getElementById('statusNav');
+        nav.innerHTML = '';
+        const counts = { all: currentReportList.length, submitted: 0, inprogress: 0, resolved: 0 };
+        currentReportList.forEach(r => { counts[r.status]++; });
+        
+        Object.keys(statusConfig).forEach(status => {
+            const info = statusConfig[status];
+            const btn = `
+                <button class="status-btn fancy-status w-full text-left flex items-center justify-between p-2 rounded-lg transition-colors hover:bg-gray-100 ${status === activeStatusFilter ? `${info.lightColor} ${info.color} active` : ''}" data-status="${status}" onclick="setFilter('${status}')">
+                    <span class="flex items-center gap-3">
+                        <i class="fa-solid ${info.icon}"></i>
+                        ${info.text}
+                    </span>
+                    <span class="text-xs font-bold bg-white px-2 py-0.5 rounded-full">${counts[status]}</span>
+                </button>`;
+            nav.innerHTML += btn;
+        });
+    }
+
+    function setFilter(status) {
+        activeStatusFilter = status;
+        renderStatusFilters(); // Re-render to show active state
+        renderReportList();
+        // Clear detail view when filter changes
+        document.getElementById('reportDetailView').innerHTML = `
+            <div class="text-center text-gray-500 py-24">
+                <i class="fa-solid fa-arrow-left text-3xl mb-4"></i>
+                <p class="font-semibold">Select a report from the list to view its details.</p>
+            </div>`;
+    }
+
+    function renderReportList() {
+        const container = document.getElementById('reportListContainer');
+        container.innerHTML = '';
+        const filteredReports = activeStatusFilter === 'all'
+            ? currentReportList
+            : currentReportList.filter(r => r.status === activeStatusFilter);
+        
+        if (filteredReports.length === 0) {
+            container.innerHTML = `<p class="text-center text-gray-500 p-4">No reports found for this status.</p>`;
+            return;
+        }
+
+        filteredReports.forEach(r => {
+            const deptInfo = departmentInfo[r.issueCategory];
+            // Status badge with color
+            const statusBadge = `<span class="status-badge px-2 py-0.5 rounded-full text-xs font-semibold ${
+                r.status === 'submitted' ? 'bg-yellow-200 text-yellow-800'
+                : r.status === 'inprogress' ? 'bg-blue-200 text-blue-800'
+                : 'bg-green-200 text-green-800'
+            }">${r.status}</span>`;
+            const item = `
+                <div class="report-list-item p-3 rounded-lg cursor-pointer hover:bg-gray-50 border-l-4 ${activeReportId === r.trackingId ? 'border-blue-500' : 'border-transparent'}" onclick="renderReportDetail('${r.trackingId}')">
+                  <div class="flex justify-between items-center">
+                    <p class="font-semibold text-sm line-clamp-1">${r.issueDescription}</p>
+                    ${statusBadge}
+                  </div>
+                  <p class="text-xs text-gray-500 font-mono">${r.trackingId}</p>
+                </div>`;
+            container.innerHTML += item;
+        });
+    }
+
+    function renderReportDetail(reportId) {
+        activeReportId = reportId;
+        renderReportList(); // Re-render list to highlight active item
+        const report = currentReportList.find(r => r.trackingId === reportId);
+        if (!report) return;
+
+        const detailContainer = document.getElementById('reportDetailView');
+        const deptInfo = departmentInfo[report.issueCategory];
+
+        const userImages = report.photos.length > 0
+            ? report.photos.map(p => `<img src="${p.dataUrl || p}" class="w-full h-40 object-cover rounded-lg shadow-md border"/>`).join("")
+            : "<p class='text-sm text-gray-500 col-span-full'>No photos were submitted by the user.</p>";
+        
+        const solvedImage = report.solvedPhoto ? `<div class="mt-4"><h4 class="font-semibold text-md text-gray-700 mb-2">Proof of Resolution</h4><img src="${report.solvedPhoto}" class="w-full h-60 object-cover rounded-lg shadow-lg border"/></div>` : "";
+
+        detailContainer.innerHTML = `
+            <div class="space-y-5">
+                <div>
+                  <label class="text-xs font-semibold text-gray-500 uppercase">Description</label>
+                  <div class="description-box">${report.issueDescription}</div>
+                </div>
+                <!-- Map Integration -->
+                <div id="reportMap" class="w-full h-64 rounded-lg mt-4"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm border-t pt-4">
+                  <p><strong><i class="fa-solid fa-hashtag w-5"></i> Tracking ID:</strong> <span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded">${report.trackingId}</span></p>
+                  <p><strong><i class="fa-solid fa-calendar-days w-5"></i> Submitted:</strong> ${new Date(report.timestamp).toLocaleString()}</p>
+                  <p><strong><i class="fa-solid fa-location-dot w-5"></i> Coordinates:</strong> Lat: ${report.latitude.toFixed(6)}, Lng: ${report.longitude.toFixed(6)}</p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-md text-gray-700 mb-2">Submitted Photos</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${userImages}</div>
+                </div>
+                
+                ${solvedImage}
+
+                <!-- History Section -->
+                <div class="mt-4">
+                    <h4 class="font-semibold text-md text-gray-700 mb-2">History</h4>
+                    <ul class="list-disc pl-5 text-sm text-gray-600">
+                        ${report.history && report.history.length > 0 ? report.history.map(h => `<li>${new Date(h.timestamp).toLocaleString()}: ${h.status}</li>`).join('') : '<li>No history available.</li>'}
+                    </ul>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="mt-4">
+                    <h4 class="font-semibold text-md text-gray-700 mb-2">Comments</h4>
+                    <ul id="commentsList" class="list-disc pl-5 text-sm text-gray-600">
+                        ${report.comments ? report.comments.map(c => `<li>${new Date(c.timestamp).toLocaleString()}: ${c.text}</li>`).join('') : ''}
+                    </ul>
+                    <textarea id="newComment" class="w-full border rounded p-2 mt-2" placeholder="Add a comment"></textarea>
+                    <button class="fancy-btn mt-2" onclick="addComment('${report.trackingId}')">Add Comment</button>
+                </div>
+
+                <div class="border-t pt-4 mt-6 space-y-4">
+                    <h4 class="font-semibold text-md text-gray-800">Manage Report</h4>
+                    <div class="flex items-center gap-4">
+                        <label for="modal-status-${report.trackingId}" class="text-sm font-medium">Update Status:</label>
+                        <select id="modal-status-${report.trackingId}" onchange="updateStatus('${report.trackingId}', this.value)" class="fancy-btn w-full border border-gray-300 rounded-lg p-2 focus:ring-2 ${deptInfo.borderColor}">
+                            <option value="submitted" ${report.status === 'submitted' ? 'selected' : ''}>Pending</option>
+                            <option value="inprogress" ${report.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
+                            <option value="resolved" ${report.status === 'resolved' ? 'selected' : ''}>Solved</option>
+                        </select>
+                    </div>
+                    <div id="modal-photo-upload-${report.trackingId}" class="${report.status === 'resolved' ? '' : 'hidden'}">
+                         <label for="modal-photo-${report.trackingId}" class="block text-sm font-medium mb-1">Upload Solved Photo:</label>
+                         <input type="file" id="modal-photo-${report.trackingId}" onchange="uploadSolvedPhoto('${report.trackingId}', this)" accept="image/*" capture="environment" class="fancy-btn w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-100 hover:file:bg-gray-200"/>
+                    </div>
+                </div>
+              </div>
+        `;
+        // Render map after HTML update
+        setTimeout(() => renderMapForReport(report), 0);
+    }
+
+    function updateStatus(reportId, newStatus) {
+        let reports = getAllReports();
+        const reportIndex = reports.findIndex(r => r.trackingId === reportId);
+        if (reportIndex !== -1) {
+            // Add to history
+            if (!Array.isArray(reports[reportIndex].history)) {
+                reports[reportIndex].history = [];
+            }
+            reports[reportIndex].history.push({ status: newStatus, timestamp: Date.now() });
+            reports[reportIndex].status = newStatus;
+            localStorage.setItem('reports', JSON.stringify(reports));
+            // Refresh data and UI
+            currentReportList = getAllReports().filter(r => r.issueCategory === currentAnalyticsCategory);
+            renderReportDetail(reportId);
+            renderStatusFilters();
+        }
+    }
+
+    function uploadSolvedPhoto(reportId, inputElement) {
+        if (inputElement.files && inputElement.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                let reports = getAllReports();
+                const reportIndex = reports.findIndex(r => r.trackingId === reportId);
+                if (reportIndex !== -1) {
+                    reports[reportIndex].solvedPhoto = e.target.result;
+                    localStorage.setItem('reports', JSON.stringify(reports));
+                    alert('Solved photo uploaded!');
+                    // Refresh data and UI
+                    currentReportList = getAllReports().filter(r => r.issueCategory === currentAnalyticsCategory);
+                    renderReportDetail(reportId);
+                }
+            };
+            reader.readAsDataURL(inputElement.files[0]);
+        }
+    }
+
+    // --- EVENT LISTENERS & INITIALIZATION --- //
+    document.getElementById('backToHubBtn').addEventListener('click', showDepartmentsList);
+    document.addEventListener("DOMContentLoaded", renderDepartmentHub);
+
+
+    // --- LOGOUT FUNCTION --- //
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'depatment_login.html';
+    }
+</script>
+
 </body>
 </html>
 
+
+   
