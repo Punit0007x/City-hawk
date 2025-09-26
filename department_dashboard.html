@@ -14,16 +14,8 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(45deg, #ff6ec4, #7873f5, #42e695, #fddb92);
-      background-size: 800% 800%;
-      animation: gradientBackground 25s ease infinite;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: #1f2937;
-    }
-
-    @keyframes gradientBackground {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
     .gradient-text { background-image: linear-gradient(to right, #4f46e5, #a259ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .view-hidden { display: none; }
@@ -109,6 +101,7 @@
 <header class="bg-white/80 backdrop-blur-sm shadow-md sticky top-0 z-30">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
     <h1 class="text-2xl font-bold gradient-text">Department Hub</h1>
+    <button onclick="logout()" class="fancy-btn text-sm">Logout</button>
   </div>
 </header>
 
@@ -522,6 +515,11 @@
     document.addEventListener("DOMContentLoaded", renderDepartmentHub);
 
 
+    // --- LOGOUT FUNCTION --- //
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'depatment_login.html';
+    }
 </script>
 
 </body>
