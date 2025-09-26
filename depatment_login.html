@@ -13,13 +13,14 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a, #134e4a); /* From Slate-900 to Teal-900 */
+            background: linear-gradient(135deg, #1e3a8a, #9333ea, #f59e0b); /* Blue, Purple, Gold */
             min-height: 100vh;
         }
         .login-card-container {
             background-color: rgba(31, 41, 55, 0.8);
             backdrop-filter: blur(10px);
             border-radius: 1.25rem; /* slightly larger than the card for the bar */
+            border: 2px solid rgba(255,255,255,0.2);
         }
     </style>
 </head>
@@ -29,12 +30,12 @@
         <div class="w-full max-w-md">
             <div class="login-card-container shadow-2xl border border-gray-700 overflow-hidden">
                 <!-- Tri-color Accent Bar -->
-                <div class="h-1.5 w-full bg-gradient-to-r from-orange-500 via-white to-green-600"></div>
+                <div class="h-1.5 w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600"></div>
 
                 <div class="p-8">
                     <div class="text-center mb-8">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/120px-Emblem_of_India.svg.png" alt="Emblem of India" class="mx-auto h-20 w-auto mb-4" />
-                        <h1 class="text-3xl font-bold text-white">Government of India</h1>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/120px-Emblem_of_India.svg.png" alt="Emblem of India" class="mx-auto h-20 w-auto mb-4 filter invert brightness-0" />
+                        <h1 class="text-3xl font-bold text-white">City Hawk Department Portal</h1>
                         <p class="text-gray-400 mt-2">Department Login</p>
                     </div>
 
@@ -86,7 +87,7 @@
 
             // --- Mock Authentication ---
             // In a real application, this would be an API call.
-            if (username === 'admin' && password === 'admin') {
+            if (username === 'admin' && password === 'password123') {
                 errorMessage.classList.add('hidden');
                 
                 // On successful login, redirect to the dashboard.
